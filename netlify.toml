@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA fallback: any unknown path returns index.html so React Router (later) works.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
