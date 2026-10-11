@@ -1,8 +1,19 @@
+import { Routes, Route } from 'react-router-dom'
+import Layout from './components/Layout.jsx'
+import Cover from './pages/Cover.jsx'
+import Home from './pages/Home.jsx'
+import Gallery from './pages/Gallery.jsx'
+import Packages from './pages/Packages.jsx'
+
 export default function App() {
   return (
-    <main className="placeholder">
-      <h1>Photography Portfolio</h1>
-      <p>Coming soon.</p>
-    </main>
+    <Routes>
+      <Route path="/" element={<Cover />} />
+      <Route element={<Layout />}>
+        <Route path="home" element={<Home />} />
+        <Route path="gallery" element={<Gallery />} />
+        <Route path="packages" element={<Packages />} />
+      </Route>
+    </Routes>
   )
 }
