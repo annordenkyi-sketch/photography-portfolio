@@ -11,12 +11,12 @@ export default function Cover() {
         className="cover-bg"
         src={COVER_IMAGE}
         alt=""
-        fetchpriority="high"
+        fetchPriority="high"
         aria-hidden="true"
       />
       <div className="cover-overlay" />
       <div className="cover-content">
-        <h1 className="cover-brand reveal reveal-1">Perry Photography</h1>
+        <h1 className="cover-brand reveal reveal-1">Perry Studios</h1>
         <p className="cover-tagline reveal reveal-2">Weddings · Portraits · Events · Landscapes</p>
         <div className="reveal reveal-3">
           <Link to="/home" className="btn btn-cover">Enter site</Link>

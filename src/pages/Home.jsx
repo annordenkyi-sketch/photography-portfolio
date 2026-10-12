@@ -11,12 +11,12 @@ export default function Home() {
         className="hero-bg"
         src={HERO_IMAGE}
         alt=""
-        fetchpriority="high"
+        fetchPriority="high"
         aria-hidden="true"
       />
       <div className="hero-overlay" />
       <div className="hero-content">
-        <h1 className="reveal reveal-1">Perry Photography</h1>
+        <h1 className="reveal reveal-1">Perry Studios</h1>
         <p className="tagline reveal reveal-2">
           Capturing weddings, portraits, events and landscapes with a careful eye and an honest story.
         </p>

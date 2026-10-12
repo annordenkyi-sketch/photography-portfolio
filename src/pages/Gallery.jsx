@@ -43,7 +43,7 @@ export default function Gallery() {
           className="page-hero-bg"
           src={GALLERY_HERO}
           alt=""
-          fetchpriority="high"
+          fetchPriority="high"
           aria-hidden="true"
         />
         <div className="page-hero-overlay" />

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import Cover from './pages/Cover.jsx'
 import Home from './pages/Home.jsx'
@@ -13,6 +13,8 @@ export default function App() {
         <Route path="home" element={<Home />} />
         <Route path="gallery" element={<Gallery />} />
         <Route path="packages" element={<Packages />} />
+        {/* Legacy /book URL now redirects to the packages page where booking lives. */}
+        <Route path="book" element={<Navigate to="/packages" replace />} />
       </Route>
     </Routes>
   )
