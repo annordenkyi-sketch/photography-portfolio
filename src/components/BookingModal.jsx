@@ -1,11 +1,17 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import MonthCalendar from './admin/MonthCalendar.jsx'
+import * as bookingsService from '../services/bookingsService.js'
+import * as slotsService from '../services/slotsService.js'
+import * as notificationsService from '../services/notificationsService.js'
+
+function shortDate(iso) {
+  return new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+}
 
 const emptyForm = {
   name: '',
   phone: '',
   email: '',
-  date: '',
-  time: '',
   location: '',
   notes: '',
 }
@@ -22,21 +28,41 @@ export default function BookingModal({ pkg, onClose }) {
   const [form, setForm] = useState(emptyForm)
   const [errors, setErrors] = useState({})
   const [submitted, setSubmitted] = useState(null)
+  const [date, setDate] = useState('')
+  const [slotRun, setSlotRun] = useState(null)
+  const [slotError, setSlotError] = useState('')
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = new Date()
+  const [monthView, setMonthView] = useState({ month: today.getMonth(), year: today.getFullYear() })
 
-  // Keep onClose in a ref so the open/close effect doesn't re-fire whenever
-  // the parent re-renders (which would close+reopen the dialog mid-interaction).
+  const slotsNeeded = slotsService.getPackageSlotCount(pkg.name)
+
+  const dateMeta = useMemo(() => {
+    const todayIso = today.toISOString().split('T')[0]
+    return (iso, d) => {
+      // disable past
+      if (iso < todayIso) return { status: 'default', disabled: true }
+      const avail = slotsService.getDayAvailability(iso)
+      if (avail.kind === 'offday') return { status: 'offday', label: 'Off', disabled: true }
+      if (avail.kind === 'blocked') return { status: 'blocked', label: 'Blocked', disabled: true }
+      const canFit = slotsService.getAvailableRuns(iso, slotsNeeded).length > 0
+      if (!canFit) return { status: 'full', label: 'Full', disabled: true }
+      return { status: avail.kind, label: `${avail.available}/${avail.total}` }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slotsNeeded])
+
+  const runs = useMemo(() => {
+    if (!date) return []
+    return slotsService.getAvailableRuns(date, slotsNeeded)
+  }, [date, slotsNeeded])
+
+  // Keep onClose stable for native dialog close listener
   const onCloseRef = useRef(onClose)
   useEffect(() => {
     onCloseRef.current = onClose
   }, [onClose])
 
-  // Open the native dialog on mount; sync Escape → onClose. We intentionally do
-  // NOT call dialog.close() in cleanup — that queues an async `close` event
-  // which, under StrictMode's cleanup→remount cycle, is caught by the next
-  // mount's listener and immediately unmounts us. Real unmount closes the
-  // dialog implicitly when the element is removed from the DOM.
   useEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
@@ -48,11 +74,8 @@ export default function BookingModal({ pkg, onClose }) {
     }
   }, [])
 
-  // Click outside the dialog panel = close. Clicks inside bubble but land on children.
   function handleBackdropClick(e) {
-    const dialog = dialogRef.current
-    if (!dialog || e.target !== dialog) return
-    onClose()
+    if (e.target === dialogRef.current) onCloseRef.current()
   }
 
   function handleChange(e) {
@@ -71,17 +94,56 @@ export default function BookingModal({ pkg, onClose }) {
     e.preventDefault()
     const errs = validate(form)
     setErrors(errs)
-    if (Object.keys(errs).length > 0) {
-      document.getElementById(Object.keys(errs)[0])?.focus()
+    let localSlotError = ''
+    if (!date) localSlotError = 'Please pick a date.'
+    else if (!slotRun) localSlotError = 'Please pick an available slot.'
+    setSlotError(localSlotError)
+    if (Object.keys(errs).length > 0 || localSlotError) {
+      if (Object.keys(errs).length > 0) {
+        document.getElementById(Object.keys(errs)[0])?.focus()
+      }
       return
     }
-    // Frontend-only for now: snapshot the booking and show the confirmation.
-    // When wiring real email: POST { ...cleaned, package: pkg.name, price: pkg.price }
-    // to Netlify Forms / a backend here, and set `submitted` on success. Subject
-    // line should be "New Booking: " + pkg.name.
-    const cleaned = { ...form, location: form.location.trim() }
-    setSubmitted(cleaned)
+
+    const slot = slotRun.startSlot
+    const created = bookingsService.add({
+      clientName: form.name.trim(),
+      phone: form.phone.trim(),
+      email: form.email.trim(),
+      package: pkg.name,
+      totalAmount: pkg.amount || 0,
+      date,
+      time: slot.start,
+      slotIds: slotRun.slotIds,
+      location: form.location.trim(),
+      notes: form.notes.trim(),
+      status: 'pending',
+    })
+
+    // Admin notification + toast
+    try {
+      notificationsService.add({
+        type: 'new_booking',
+        message: `${created.clientName} booked a ${pkg.name} shoot for ${shortDate(date)}`,
+        targetType: 'booking',
+        targetId: created.id,
+      })
+    } catch { /* non-browser */ }
+
+    setSubmitted({
+      ...created,
+      date,
+      slotLabel: slotRun.label,
+    })
+    setForm(emptyForm)
+    setErrors({})
+    setDate('')
+    setSlotRun(null)
     scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function reset() {
+    setSubmitted(null)
   }
 
   return (
@@ -112,7 +174,7 @@ export default function BookingModal({ pkg, onClose }) {
         {submitted ? (
           <Confirmation booking={submitted} pkg={pkg} onClose={onClose} />
         ) : (
-          <form className="booking-modal-form" onSubmit={handleSubmit} noValidate={false}>
+          <form className="booking-modal-form" onSubmit={handleSubmit}>
             <div className="form-field">
               <label htmlFor="name">Full name *</label>
               <input
@@ -136,6 +198,7 @@ export default function BookingModal({ pkg, onClose }) {
                   value={form.phone}
                   onChange={handleChange}
                   autoComplete="tel"
+                  placeholder="+233 24 123 4567"
                   required
                 />
               </div>
@@ -152,30 +215,57 @@ export default function BookingModal({ pkg, onClose }) {
               </div>
             </div>
 
-            <div className="form-row">
-              <div className="form-field">
-                <label htmlFor="date">Preferred date *</label>
-                <input
-                  type="date"
-                  id="date"
-                  name="date"
-                  min={today}
-                  value={form.date}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="form-field">
-                <label htmlFor="time">Preferred time</label>
-                <input
-                  type="time"
-                  id="time"
-                  name="time"
-                  value={form.time}
-                  onChange={handleChange}
-                />
-              </div>
+            <div className="form-field">
+              <label>Preferred date *</label>
+              <p className="form-help">
+                {pkg.name} needs {slotsNeeded} slot{slotsNeeded === 1 ? '' : 's'}. Grey dates are closed, blocked, or full.
+              </p>
+              <MonthCalendar
+                month={monthView.month}
+                year={monthView.year}
+                onMonthChange={setMonthView}
+                selectedDate={date}
+                onSelectDate={(iso) => {
+                  setDate(iso)
+                  setSlotRun(null)
+                  setSlotError('')
+                }}
+                dateMeta={dateMeta}
+                compact
+              />
             </div>
+
+            {date && (
+              <div className="form-field">
+                <label>Preferred time *</label>
+                {runs.length === 0 ? (
+                  <p className="form-help">No available slots on this date — try another.</p>
+                ) : (
+                  <div className="slot-picker">
+                    {runs.map((run) => {
+                      const picked = slotRun?.startSlot.id === run.startSlot.id
+                      return (
+                        <button
+                          key={run.startSlot.id}
+                          type="button"
+                          className={`slot-pick${picked ? ' is-picked' : ''}`}
+                          onClick={() => {
+                            setSlotRun(run)
+                            setSlotError('')
+                          }}
+                        >
+                          {run.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {slotError && (
+              <p className="form-error" role="alert">{slotError}</p>
+            )}
 
             <div className="form-field">
               <label htmlFor="location">Location *</label>
@@ -189,10 +279,10 @@ export default function BookingModal({ pkg, onClose }) {
                 autoComplete="address-level2"
                 aria-required="true"
                 aria-invalid={!!errors.location}
-                aria-describedby={errors.location ? 'location-error' : undefined}
+                required
               />
               {errors.location && (
-                <p className="form-error" id="location-error" role="alert">
+                <p className="form-error" role="alert">
                   {errors.location}
                 </p>
               )}
@@ -206,7 +296,7 @@ export default function BookingModal({ pkg, onClose }) {
                 rows="4"
                 value={form.notes}
                 onChange={handleChange}
-                placeholder="Anything else I should know? Style references, people involved, etc."
+                placeholder="Where will the shoot be? Who is involved? Any style notes or references?"
               />
             </div>
 
@@ -228,13 +318,16 @@ export default function BookingModal({ pkg, onClose }) {
 }
 
 function Confirmation({ booking, pkg, onClose }) {
-  const when = booking.time ? `${booking.date} at ${booking.time}` : booking.date
+  const when = `${new Date(booking.date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}, ${booking.slotLabel}`
   const where = booking.location
 
   return (
     <div className="booking-modal-confirmation">
       <h3>Thanks — request received</h3>
-      <p>I'll be in touch within 48 hours to confirm.</p>
+      <p>
+        Your slot is now held while I review your request. I'll be in touch within 48 hours to
+        confirm. A copy of what you sent is below.
+      </p>
       <dl className="booking-summary">
         <dt>Package</dt>
         <dd>{pkg.name}</dd>

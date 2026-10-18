@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { packages } from '../data/packages.js'
 import BookingModal from '../components/BookingModal.jsx'
 
@@ -8,6 +8,21 @@ const PACKAGES_HERO = 'https://picsum.photos/seed/perry-packages/1920/1080'
 
 export default function Packages() {
   const [openPkg, setOpenPkg] = useState(null)
+  const cardsRef = useRef(null)
+
+  // Scroll the package cards into view on mount so visitors coming from
+  // a Book Now CTA land straight on the choices rather than the hero.
+  // Hero stays above for scroll-back. Respects reduced-motion.
+  useEffect(() => {
+    const el = cardsRef.current
+    if (!el) return
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // Defer one frame so the browser has laid out the hero first.
+    const id = window.requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' })
+    })
+    return () => window.cancelAnimationFrame(id)
+  }, [])
 
   return (
     <>
@@ -29,7 +44,7 @@ export default function Packages() {
         </div>
       </section>
 
-      <section className="container packages">
+      <section ref={cardsRef} className="container packages">
         <ul className="packages-grid">
           {packages.map((pkg) => (
             <li key={pkg.id} className={`package-card${pkg.featured ? ' is-featured' : ''}`}>
