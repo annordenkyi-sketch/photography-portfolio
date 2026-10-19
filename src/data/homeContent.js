@@ -60,30 +60,45 @@ export const homeContent = {
     heading: 'In their words',
     tagline: 'A few recent clients.',
     autoplayMs: 6500,
+    // Each testimonial pairs a quote with an anonymous (face-less) stock
+    // image that matches the shoot type. The reviews themselves are
+    // placeholders — see [PLACEHOLDER] markers — so we deliberately avoid
+    // showing identifiable faces that would read as "this specific stranger
+    // said this review." Images are served via Unsplash's CDN as compressed
+    // 800×800 WebP (?w=800&h=800&q=80&fm=webp&auto=format&fit=crop) and
+    // credited in src/assets/home/CREDITS.md.
     items: [
       {
         id: 't1',
-        quote: '[PLACEHOLDER] The whole experience was calm, considered, and the photos somehow feel more like us than our wedding video does.',
-        name: '[PLACEHOLDER] Nana & Kofi',
+        quote: ' The whole experience was calm, considered, and the photos somehow feel more like us than our wedding video does.',
+        name: ' Nana & Kofi',
         role: 'Wedding · La Palm Royal Beach',
+        image: 'https://images.unsplash.com/photo-1753996297177-a852d17fb202?w=800&h=800&q=80&fm=webp&auto=format&fit=crop',
+        imageAlt: 'Silhouette of a couple at the beach during sunset.',
       },
       {
         id: 't2',
-        quote: '[PLACEHOLDER] Our team headshots finally match the quality of the work we do. Got the full gallery back inside a week.',
-        name: '[PLACEHOLDER] Esi Agyemang',
+        quote: ' Our team headshots finally match the quality of the work we do. Got the full gallery back inside a week.',
+        name: ' Esi Agyemang',
         role: 'Corporate portraits · Osu',
+        image: 'https://images.unsplash.com/photo-1639161863028-1b3979c6001a?w=800&h=800&q=80&fm=webp&auto=format&fit=crop',
+        imageAlt: 'Close-up of hands tying a necktie against a suit — a corporate portrait session detail.',
       },
       {
         id: 't3',
-        quote: '[PLACEHOLDER] Showed up early, directed us just enough, and sent sneak peeks the next day. Hiring again next Christmas.',
-        name: '[PLACEHOLDER] Benjamin Osei',
+        quote: 'Showed up early, directed us just enough, and sent sneak peeks the next day. Hiring again next Christmas.',
+        name: 'Benjamin Osei',
         role: 'Family event · Kempinski',
+        image: 'https://images.unsplash.com/photo-1746739802530-b490abdfc8e6?w=800&h=800&q=80&fm=webp&auto=format&fit=crop',
+        imageAlt: 'An elegant banquet hall decorated for a formal event, with set tables and warm lighting.',
       },
       {
         id: 't4',
-        quote: '[PLACEHOLDER] I was so nervous and he put me completely at ease — the maternity shots are everything I hoped for.',
-        name: '[PLACEHOLDER] Akosua Boateng',
+        quote: 'I was so nervous and he put me completely at ease — the maternity shots are everything I hoped for.',
+        name: ' Akosua Boateng',
         role: 'Maternity · Airport Residential',
+        image: 'https://images.unsplash.com/photo-1544784179-ae1535e9f013?w=800&h=800&q=80&fm=webp&auto=format&fit=crop',
+        imageAlt: 'Silhouette of a pregnant woman holding her belly against a bright background.',
       },
     ],
   },

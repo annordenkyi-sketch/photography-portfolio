@@ -42,11 +42,24 @@ export default function TestimonialSlider({ items, autoplayMs = 6500 }) {
       tabIndex={0}
     >
       <figure className="testimonial-slide" aria-live="polite">
-        <blockquote className="testimonial-quote">“{t.quote}”</blockquote>
-        <figcaption className="testimonial-cite">
-          <span className="testimonial-name">{t.name}</span>
-          {t.role && <span className="testimonial-role"> · {t.role}</span>}
-        </figcaption>
+        {t.image && (
+          <div className="testimonial-media">
+            <img
+              src={t.image}
+              alt={t.imageAlt || ''}
+              loading="lazy"
+              width="800"
+              height="800"
+            />
+          </div>
+        )}
+        <div className="testimonial-body">
+          <blockquote className="testimonial-quote">“{t.quote}”</blockquote>
+          <figcaption className="testimonial-cite">
+            <span className="testimonial-name">{t.name}</span>
+            {t.role && <span className="testimonial-role"> · {t.role}</span>}
+          </figcaption>
+        </div>
       </figure>
 
       {items.length > 1 && (

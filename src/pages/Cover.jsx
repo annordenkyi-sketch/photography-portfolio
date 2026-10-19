@@ -3,9 +3,14 @@ import { Link } from 'react-router-dom'
 import * as portfolio from '../services/portfolioService.js'
 import * as studioProfile from '../services/studioProfileService.js'
 
-// Placeholder cover image. Replace the `src` with your own photo URL,
-// or drop a file into /public and reference it as "/cover.jpg".
-const COVER_IMAGE = 'https://picsum.photos/seed/perry-cover/1920/1080'
+// Default cover image: sunset over a beach with palm trees, Elmina,
+// Ghana, by Wietse Jongsma on Unsplash. Served from Unsplash's CDN with
+// WebP + resize params so it's delivered as a compressed, 1920px-wide
+// WebP without a build-time image pipeline. Attribution:
+// src/assets/home/CREDITS.md.
+// Replace in Admin → Portfolio → Website images → "Home cover" to swap
+// for the photographer's own work later.
+const COVER_IMAGE = 'https://images.unsplash.com/photo-1745102098874-0a9d16c077ee?w=1920&q=80&fm=webp&auto=format'
 
 export default function Cover() {
   const [coverImage, setCoverImage] = useState(COVER_IMAGE)
@@ -45,9 +50,8 @@ export default function Cover() {
       <img
         className="cover-bg"
         src={coverImage}
-        alt=""
+        alt="Sunset over a palm-lined beach in Elmina, Ghana."
         fetchPriority="high"
-        aria-hidden="true"
       />
       <div className="cover-overlay" />
       <div className="cover-content">

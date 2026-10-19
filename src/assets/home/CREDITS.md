@@ -10,22 +10,24 @@ All Home page imagery is served through the admin **Portfolio → Website
 images** slots so you can replace it in the browser without touching
 code:
 
-| Slot name       | Used on         | Replace in                                          |
-| --------------- | --------------- | --------------------------------------------------- |
-| `home_hero`     | Hero background | Admin → Portfolio → Website images → "Home hero"    |
-| `home_portrait` | About portrait  | Admin → Portfolio → Website images → "About portrait" |
+| Slot name       | Used on               | Replace in                                                  |
+| --------------- | --------------------- | ----------------------------------------------------------- |
+| `cover`         | Public splash (`/`)   | Admin → Portfolio → Website images → "Home cover"           |
+| `home_hero`     | Home hero background  | Admin → Portfolio → Website images → "Home hero"            |
+| `home_portrait` | Home About portrait   | Admin → Portfolio → Website images → "About portrait"       |
 
 When a slot is empty, the site falls back to a Picsum placeholder (see
 below). Picsum images are randomised per seed and are **not** licensed
 for production — they're there to let the layout work before real
 photos are uploaded.
 
-## Current fallbacks (placeholders only — replace before launch)
+## Current fallbacks
 
-| Where                          | URL                                               | License          |
-| ------------------------------ | ------------------------------------------------- | ---------------- |
-| Hero fallback                  | `https://picsum.photos/seed/perry-home/1920/1080` | Placeholder only |
-| About portrait fallback        | (none — section stays empty until uploaded)       | —                |
+| Where                          | URL                                                                                                    | License          |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------ | ---------------- |
+| Cover splash fallback          | `https://images.unsplash.com/photo-1745102098874-0a9d16c077ee?w=1920&q=80&fm=webp&auto=format`         | Unsplash License (see Attributions) |
+| Home hero fallback             | `https://picsum.photos/seed/perry-home/1920/1080`                                                      | Placeholder only — replace before launch |
+| About portrait fallback        | (none — section stays empty until uploaded)                                                            | —                |
 
 ## Replacing with real licensed photos
 
@@ -46,8 +48,12 @@ photos are uploaded.
 
 ## Attributions
 
-<!-- Add one row per real photo. Example row shown below. -->
+| Where                               | Photographer       | Source                                                                                                                                                                         | License          |
+| ----------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- |
+| Cover splash (`/`)                  | Wietse Jongsma     | [unsplash.com/photos/sunset-over-a-beach-with-palm-trees-pxXdejrvhcE](https://unsplash.com/photos/sunset-over-a-beach-with-palm-trees-pxXdejrvhcE) — "Sunset over a beach with palm trees" (Elmina, Ghana per Unsplash location tag). | [Unsplash License](https://unsplash.com/license) |
+| Testimonial 1 — Wedding (Nana & Kofi) | Sabesh Photography LTD | [unsplash.com/photos/couple-silhouetted-by-a-sunset-at-the-beach-eHxsMt30i4M](https://unsplash.com/photos/couple-silhouetted-by-a-sunset-at-the-beach-eHxsMt30i4M) — "Couple silhouetted by a sunset at the beach". | [Unsplash License](https://unsplash.com/license) |
+| Testimonial 2 — Corporate portraits (Esi Agyemang) | JV | [unsplash.com/photos/a-close-up-of-a-person-tying-a-tie-3uIKaSWEUHs](https://unsplash.com/photos/a-close-up-of-a-person-tying-a-tie-3uIKaSWEUHs) — "A close up of a person tying a tie". | [Unsplash License](https://unsplash.com/license) |
+| Testimonial 3 — Family event (Benjamin Osei) | Abhishek Tirkey | [unsplash.com/photos/a-lavish-banquet-hall-is-decorated-for-an-event-4W6Np2np-ds](https://unsplash.com/photos/a-lavish-banquet-hall-is-decorated-for-an-event-4W6Np2np-ds) — "A lavish banquet hall is decorated for an event". | [Unsplash License](https://unsplash.com/license) |
+| Testimonial 4 — Maternity (Akosua Boateng) | Janko Ferlič | [unsplash.com/photos/pregnant-woman-in-silhouette-ZNVGL_Pcf74](https://unsplash.com/photos/pregnant-woman-in-silhouette-ZNVGL_Pcf74) — "A pregnant woman in silhouette holding her belly against a bright white background". | [Unsplash License](https://unsplash.com/license) |
 
-| File                                       | Photographer   | Source URL                              | License  |
-| ------------------------------------------ | -------------- | --------------------------------------- | -------- |
-| _(none yet — using Picsum placeholders)_   |                |                                         |          |
+> All Unsplash License entries above: free for commercial and personal use; attribution appreciated but not required. Still credited here as a courtesy.

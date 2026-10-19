@@ -52,7 +52,11 @@ export const SITE_IMAGE_SLOTS = [
     label: 'Cover page hero',
     description: 'Full-screen landing image on the public cover (/).',
     recommended: 'Best size: 1920 × 1080, landscape',
-    defaultUrl: 'https://picsum.photos/seed/perry-cover/1920/1080',
+    // Sunset over a beach with palm trees, Elmina, Ghana, by Wietse
+    // Jongsma on Unsplash. Served from Unsplash's CDN with WebP + resize
+    // params (no build-time pipeline needed). Attribution lives in
+    // src/assets/home/CREDITS.md.
+    defaultUrl: 'https://images.unsplash.com/photo-1745102098874-0a9d16c077ee?w=1920&q=80&fm=webp&auto=format',
   },
   {
     key: 'home_hero',
