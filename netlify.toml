@@ -2,7 +2,17 @@
   command = "npm run build"
   publish = "dist"
 
-# SPA fallback: any unknown path returns index.html so React Router (later) works.
+# Permanent redirect from the old Cover splash URL to the Home page. Kept
+# as a 301 (not force=true because an explicit root URL is harmless, but
+# force=true guarantees the redirect even if a /index.html asset is ever
+# served from `/`). Must come BEFORE the SPA catch-all below.
+[[redirects]]
+  from = "/"
+  to = "/home"
+  status = 301
+  force = true
+
+# SPA fallback: any unknown path returns index.html so React Router works.
 [[redirects]]
   from = "/*"
   to = "/index.html"

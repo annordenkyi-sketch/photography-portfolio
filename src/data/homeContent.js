@@ -31,19 +31,13 @@ export const homeContent = {
     { number: '12',   label: 'Regions covered' },
   ],
 
+  // Section heading + tagline only. The category cards themselves are
+  // derived at render time from src/data/galleryCategories.js (shared with
+  // the Gallery tabs and admin Portfolio) so names and order can never
+  // drift. Edit a category's label or description there, not here.
   services: {
     heading: 'What I shoot',
     tagline: 'Pick the kind of work closest to yours — the gallery filters to match.',
-    // `slug` references src/data/galleryCategories.js — the shared source of
-    // truth. `displayLabel` can override the shared label if you want plural
-    // phrasing on the Home card (e.g. "Weddings") while the gallery tab
-    // stays "Wedding". The URL + filter always use the slug.
-    items: [
-      { slug: 'wedding',   displayLabel: 'Weddings',  description: 'Full-day coverage with second shooter options for ceremonies and receptions.' },
-      { slug: 'portrait',  displayLabel: 'Portraits', description: 'Individuals, families, maternity, and headshots in studio or on location.' },
-      { slug: 'event',     displayLabel: 'Events',    description: 'Corporate functions, launches, parties — candid plus formal group shots.' },
-      { slug: 'landscape', displayLabel: 'Landscape', description: 'Branded landscape commissions, travel editorial, and location scouting.' },
-    ],
   },
 
   howItWorks: {

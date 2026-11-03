@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import * as portfolio from '../../services/portfolioService.js'
+import { CATEGORY_LABELS } from '../../data/galleryCategories.js'
 import { ALLOWED_TYPES, validateFile } from '../../utils/imageProcessing.js'
 import AdminWebsiteImages from './AdminWebsiteImages.jsx'
 
@@ -108,7 +109,7 @@ function GalleryManager() {
   async function handleFiles(fileList) {
     const files = Array.from(fileList)
     if (files.length === 0) return
-    const assignCat = activeCat === 'All' ? (categories[0] || 'Wedding') : activeCat
+    const assignCat = activeCat === 'All' ? (categories[0] || CATEGORY_LABELS[0]) : activeCat
 
     const queue = files.map((f) => ({ name: f.name, status: 'processing', error: null }))
     setPending(queue)
@@ -331,7 +332,7 @@ function GalleryManager() {
 function PhotoEditForm({ photo, categories, onSave, onCancel }) {
   const [title, setTitle] = useState(photo.title || '')
   const [caption, setCaption] = useState(photo.caption || '')
-  const [category, setCategory] = useState(photo.category || categories[0] || 'Wedding')
+  const [category, setCategory] = useState(photo.category || categories[0] || CATEGORY_LABELS[0])
 
   function handleSubmit(e) {
     e.preventDefault()

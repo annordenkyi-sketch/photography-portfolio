@@ -41,7 +41,7 @@ export default function SiteFooter() {
     { label: 'About',    kind: 'anchor', href: '/home#about' },
     { label: 'Gallery',  kind: 'route',  to: '/gallery' },
     { label: 'Packages', kind: 'route',  to: '/packages' },
-    { label: 'Contact',  kind: 'anchor', href: '#site-footer-contact' },
+    { label: 'Contact',  kind: 'route',  to: '/contact' },
   ]
 
   const services = [

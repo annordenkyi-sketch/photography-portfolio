@@ -22,42 +22,51 @@ const SITE_META_KEY = 'demo:portfolio:siteImages'
 // services section can never drift apart.
 export const DEFAULT_CATEGORIES = CATEGORY_LABELS
 
-// Seeded gallery photos (external URLs — browsers cache them). Admin can
-// hide, feature, or add alongside. When new ones are uploaded they go into
-// IndexedDB and sit beside these.
+// Seeded gallery photos — real photographs from Unsplash's CDN, served
+// as compressed WebP via query params (?w=1200&q=80&fm=webp&auto=format
+// &fit=crop for full image, same but w=480 for thumb). Chosen to be
+// anonymous (silhouettes, back views, hands/detail shots, empty venues,
+// landscapes) so no identifiable face appears. Attribution: every photo
+// is credited in src/assets/home/CREDITS.md with photographer, Unsplash
+// page URL, and license (Unsplash License — free for commercial use,
+// attribution appreciated but not required).
+//
+// Admin can hide, feature, or add alongside. When new photos are
+// uploaded they go into IndexedDB and sit beside these.
+const u = (id, w) => `https://images.unsplash.com/${id}?w=${w}&q=80&fm=webp&auto=format&fit=crop`
 const SEED_PHOTOS = [
-  { id: 'seed_1',  category: 'Wedding',   src: 'https://picsum.photos/seed/wedding1/1200/800',  thumbSrc: 'https://picsum.photos/seed/wedding1/480/320',  title: 'Wedding ceremony',       caption: '',                        featured: true,  hidden: false, order: 1  },
-  { id: 'seed_2',  category: 'Wedding',   src: 'https://picsum.photos/seed/wedding2/1200/800',  thumbSrc: 'https://picsum.photos/seed/wedding2/480/320',  title: 'Bride and groom portrait', caption: '',                        featured: false, hidden: false, order: 2  },
-  { id: 'seed_3',  category: 'Wedding',   src: 'https://picsum.photos/seed/wedding3/1200/800',  thumbSrc: 'https://picsum.photos/seed/wedding3/480/320',  title: 'Reception moment',          caption: '',                        featured: false, hidden: false, order: 3  },
-  { id: 'seed_4',  category: 'Portrait',  src: 'https://picsum.photos/seed/portrait1/1200/800', thumbSrc: 'https://picsum.photos/seed/portrait1/480/320', title: 'Studio portrait',           caption: '',                        featured: true,  hidden: false, order: 4  },
-  { id: 'seed_5',  category: 'Portrait',  src: 'https://picsum.photos/seed/portrait2/1200/800', thumbSrc: 'https://picsum.photos/seed/portrait2/480/320', title: 'Outdoor portrait',          caption: '',                        featured: false, hidden: false, order: 5  },
-  { id: 'seed_6',  category: 'Portrait',  src: 'https://picsum.photos/seed/portrait3/1200/800', thumbSrc: 'https://picsum.photos/seed/portrait3/480/320', title: 'Candid portrait',           caption: '',                        featured: false, hidden: false, order: 6  },
-  { id: 'seed_7',  category: 'Event',     src: 'https://picsum.photos/seed/event1/1200/800',    thumbSrc: 'https://picsum.photos/seed/event1/480/320',    title: 'Corporate event',           caption: '',                        featured: true,  hidden: false, order: 7  },
-  { id: 'seed_8',  category: 'Event',     src: 'https://picsum.photos/seed/event2/1200/800',    thumbSrc: 'https://picsum.photos/seed/event2/480/320',    title: 'Birthday celebration',      caption: '',                        featured: false, hidden: false, order: 8  },
-  { id: 'seed_9',  category: 'Landscape', src: 'https://picsum.photos/seed/landscape1/1200/800',thumbSrc: 'https://picsum.photos/seed/landscape1/480/320',title: 'Mountain landscape',        caption: '',                        featured: false, hidden: false, order: 9  },
-  { id: 'seed_10', category: 'Landscape', src: 'https://picsum.photos/seed/landscape2/1200/800',thumbSrc: 'https://picsum.photos/seed/landscape2/480/320',title: 'Coastal landscape',         caption: '',                        featured: false, hidden: false, order: 10 },
-  { id: 'seed_11', category: 'Landscape', src: 'https://picsum.photos/seed/landscape3/1200/800',thumbSrc: 'https://picsum.photos/seed/landscape3/480/320',title: 'Forest landscape',          caption: '',                        featured: false, hidden: false, order: 11 },
-  { id: 'seed_12', category: 'Event',     src: 'https://picsum.photos/seed/other1/1200/800',    thumbSrc: 'https://picsum.photos/seed/other1/480/320',    title: 'Street photography',        caption: '',                        featured: false, hidden: false, order: 12 },
-  // Extra 4 photos so every category has at least 4 shots in the seed.
-  { id: 'seed_13', category: 'Wedding',   src: 'https://picsum.photos/seed/wedding4/1200/800',  thumbSrc: 'https://picsum.photos/seed/wedding4/480/320',  title: 'First dance',               caption: '',                        featured: false, hidden: false, order: 13 },
-  { id: 'seed_14', category: 'Portrait',  src: 'https://picsum.photos/seed/portrait4/1200/800', thumbSrc: 'https://picsum.photos/seed/portrait4/480/320', title: 'Family portrait',           caption: '',                        featured: false, hidden: false, order: 14 },
-  { id: 'seed_15', category: 'Event',     src: 'https://picsum.photos/seed/event3/1200/800',    thumbSrc: 'https://picsum.photos/seed/event3/480/320',    title: 'Conference keynote',        caption: '',                        featured: false, hidden: false, order: 15 },
-  { id: 'seed_16', category: 'Landscape', src: 'https://picsum.photos/seed/landscape4/1200/800',thumbSrc: 'https://picsum.photos/seed/landscape4/480/320',title: 'Sunset over the lagoon',    caption: '',                        featured: false, hidden: false, order: 16 },
+  // --- Wedding (6) --------------------------------------------------
+  { id: 'seed_1',  category: 'Wedding',   src: u('photo-1697059354929-731142fe2515', 1200), thumbSrc: u('photo-1697059354929-731142fe2515', 480), title: 'Wedding ring on a bouquet',              caption: 'Rings + flowers detail',       featured: true,  hidden: false, order: 1  },
+  { id: 'seed_2',  category: 'Wedding',   src: u('photo-1758712508646-49eb3ced4e89', 1200), thumbSrc: u('photo-1758712508646-49eb3ced4e89', 480), title: 'Hands with wedding rings',               caption: 'Couple detail',                featured: false, hidden: false, order: 2  },
+  { id: 'seed_3',  category: 'Wedding',   src: u('photo-1512101481582-ef0ef96bd7be', 1200), thumbSrc: u('photo-1512101481582-ef0ef96bd7be', 480), title: 'Bride walking on the shore',             caption: 'Beach ceremony',               featured: false, hidden: false, order: 3  },
+  { id: 'seed_4',  category: 'Wedding',   src: u('photo-1562254609-151750be7f5a', 1200),    thumbSrc: u('photo-1562254609-151750be7f5a', 480),    title: 'Bride on the staircase',                 caption: 'Pre-ceremony moment',          featured: false, hidden: false, order: 4  },
+  { id: 'seed_5',  category: 'Wedding',   src: u('photo-1728713351269-79d2e63926f2', 1200), thumbSrc: u('photo-1728713351269-79d2e63926f2', 480), title: 'Couple dancing in smoke',                 caption: 'Reception atmosphere',         featured: false, hidden: false, order: 5  },
+  { id: 'seed_6',  category: 'Wedding',   src: u('photo-1623610641251-a3252bea79f6', 1200), thumbSrc: u('photo-1623610641251-a3252bea79f6', 480), title: 'Beach silhouette at sunset',             caption: 'Couple at golden hour',        featured: false, hidden: false, order: 6  },
+
+  // --- Portrait (6) -------------------------------------------------
+  { id: 'seed_7',  category: 'Portrait',  src: u('photo-1767130298927-2df12c33e5d6', 1200), thumbSrc: u('photo-1767130298927-2df12c33e5d6', 480), title: 'Portrait studio setup',                   caption: 'Studio with softbox lighting', featured: true,  hidden: false, order: 7  },
+  { id: 'seed_8',  category: 'Portrait',  src: u('photo-1758825175271-168064c2004c', 1200), thumbSrc: u('photo-1758825175271-168064c2004c', 480), title: 'Hands holding the camera',                caption: 'Behind the lens',              featured: false, hidden: false, order: 8  },
+  { id: 'seed_9',  category: 'Portrait',  src: u('photo-1760061398084-0ec65a992725', 1200), thumbSrc: u('photo-1760061398084-0ec65a992725', 480), title: 'Professional lens close-up',              caption: 'Shoot-day gear',               featured: false, hidden: false, order: 9  },
+  { id: 'seed_10', category: 'Portrait',  src: u('flagged/photo-1576011276208-39d066a314ba', 1200), thumbSrc: u('flagged/photo-1576011276208-39d066a314ba', 480), title: 'Maternity shoot at sundown',       caption: 'Silhouette on the shore',      featured: false, hidden: false, order: 10 },
+  { id: 'seed_11', category: 'Portrait',  src: u('photo-1453137494194-411b946480fe', 1200), thumbSrc: u('photo-1453137494194-411b946480fe', 480), title: 'Lens detail',                             caption: 'Session detail',               featured: false, hidden: false, order: 11 },
+  { id: 'seed_12', category: 'Portrait',  src: u('photo-1659697067461-f9604d8f9898', 1200), thumbSrc: u('photo-1659697067461-f9604d8f9898', 480), title: 'Camera on dark backdrop',                 caption: 'Studio prep',                  featured: false, hidden: false, order: 12 },
+
+  // --- Event (4) ----------------------------------------------------
+  { id: 'seed_13', category: 'Event',     src: u('photo-1711733865005-8c0b2f1d4794', 1200), thumbSrc: u('photo-1711733865005-8c0b2f1d4794', 480), title: 'Empty auditorium ready for the event',    caption: 'Venue, before doors open',     featured: true,  hidden: false, order: 13 },
+  { id: 'seed_14', category: 'Event',     src: u('photo-1625649611137-df49dc542f6a', 1200), thumbSrc: u('photo-1625649611137-df49dc542f6a', 480), title: 'Birthday cake with candles',              caption: 'Celebration detail',           featured: false, hidden: false, order: 14 },
+  { id: 'seed_15', category: 'Event',     src: u('photo-1702763529935-f4f7b4df3380', 1200), thumbSrc: u('photo-1702763529935-f4f7b4df3380', 480), title: 'Conference venue before guests arrive',   caption: 'Corporate setup',              featured: false, hidden: false, order: 15 },
+  { id: 'seed_16', category: 'Event',     src: u('photo-1760092189954-5b2f6eb3ca88', 1200), thumbSrc: u('photo-1760092189954-5b2f6eb3ca88', 480), title: 'Hands raised at the celebration',         caption: 'Crowd silhouette',             featured: false, hidden: false, order: 16 },
+
+  // --- Landscape (5) ------------------------------------------------
+  { id: 'seed_17', category: 'Landscape', src: u('photo-1776153381006-043d50ab44eb', 1200), thumbSrc: u('photo-1776153381006-043d50ab44eb', 480), title: 'Elmina fishing village',                  caption: 'Elmina, Ghana',                featured: true,  hidden: false, order: 17 },
+  { id: 'seed_18', category: 'Landscape', src: u('photo-1562490654-3f78be490c66', 1200),    thumbSrc: u('photo-1562490654-3f78be490c66', 480),    title: 'Fishermen boat at Cape Coast',            caption: 'Cape Coast, Ghana',            featured: false, hidden: false, order: 18 },
+  { id: 'seed_19', category: 'Landscape', src: u('photo-1568025848823-86404cd04ad1', 1200), thumbSrc: u('photo-1568025848823-86404cd04ad1', 480), title: 'Accra from the air',                      caption: 'Accra, Ghana',                 featured: false, hidden: false, order: 19 },
+  { id: 'seed_20', category: 'Landscape', src: u('photo-1762222630690-20a58212af83', 1200), thumbSrc: u('photo-1762222630690-20a58212af83', 480), title: 'Golden-hour coastline',                   caption: 'Rocky coast at sunset',        featured: false, hidden: false, order: 20 },
+  { id: 'seed_21', category: 'Landscape', src: u('photo-1771450092348-5f33e2cc2963', 1200), thumbSrc: u('photo-1771450092348-5f33e2cc2963', 480), title: 'City skyline at dusk',                    caption: 'Aerial dusk cityscape',        featured: false, hidden: false, order: 21 },
 ]
 
 // Default website image slots (what the public site falls back to)
 export const SITE_IMAGE_SLOTS = [
-  {
-    key: 'cover',
-    label: 'Cover page hero',
-    description: 'Full-screen landing image on the public cover (/).',
-    recommended: 'Best size: 1920 × 1080, landscape',
-    // Sunset over a beach with palm trees, Elmina, Ghana, by Wietse
-    // Jongsma on Unsplash. Served from Unsplash's CDN with WebP + resize
-    // params (no build-time pipeline needed). Attribution lives in
-    // src/assets/home/CREDITS.md.
-    defaultUrl: 'https://images.unsplash.com/photo-1745102098874-0a9d16c077ee?w=1920&q=80&fm=webp&auto=format',
-  },
   {
     key: 'home_hero',
     label: 'Home page hero',
@@ -139,7 +148,7 @@ export async function resolveFullUrl(photo) {
 }
 
 // Upload: process file, store blobs, add metadata.
-export async function uploadPhoto(file, { category = 'Wedding', title = '', caption = '' } = {}) {
+export async function uploadPhoto(file, { category = CATEGORY_LABELS[0], title = '', caption = '' } = {}) {
   const { fullBlob, thumbBlob } = await processImage(file)
   const id = `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`
   await idbSet(`photo:${id}:full`, fullBlob)
