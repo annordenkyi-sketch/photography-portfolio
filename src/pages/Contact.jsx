@@ -39,8 +39,8 @@ function validate({ name, phone, email, message }) {
   if (!name.trim()) errors.name = 'Please enter your name.'
   if (!phone.trim()) errors.phone = 'Please enter your phone number.'
   else if (!/^\+?\d[\d\s()-]{7,}$/.test(phone.trim())) errors.phone = 'Please enter a valid number with country code, e.g. +233 20 123 4567.'
-  if (!email.trim()) errors.email = 'Please enter your email.'
-  else if (!/^\S+@\S+\.\S+$/.test(email.trim())) errors.email = 'Please enter a valid email address.'
+  // Email is optional (as in the booking form); checked only when given.
+  if (email.trim() && !/^\S+@\S+\.\S+$/.test(email.trim())) errors.email = 'Please enter a valid email address.'
   if (!message.trim()) errors.message = 'Please write a short message.'
   return errors
 }
@@ -118,7 +118,7 @@ export default function Contact() {
 
   // The success message names the reply address only once a real email is
   // saved in Admin → Settings (the built-in default is a placeholder).
-  const realEmail = profile.email && profile.email !== studioProfile.DEFAULT_PROFILE.email ? profile.email : ''
+  const realEmail = studioProfile.realContact(profile).email
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -230,9 +230,6 @@ export default function Contact() {
         <div className="ct-hero-scrim" aria-hidden="true" />
         <div className="ct-hero-content">
           <h1 className="ct-hero-title ct-in" style={{ '--ct-delay': '600ms' }}>Get in touch</h1>
-          <p className="ct-hero-text ct-in" style={{ '--ct-delay': '780ms' }}>
-            Tell me about your shoot &mdash; I usually reply within 48 hours.
-          </p>
         </div>
         <a href="#contact-form" className="ct-scroll ct-in" style={{ '--ct-delay': '960ms' }}>
           <span className="ct-scroll-track" aria-hidden="true"><span className="ct-scroll-dot" /></span>
@@ -288,10 +285,12 @@ export default function Contact() {
                 </div>
 
                 <div className={`ct-field ct-reveal${errors.email ? ' has-error' : ''}`}>
-                  <label htmlFor="contact-email">Email address <span aria-hidden="true">*</span></label>
+                  <label htmlFor="contact-email">Email address <span className="ct-optional">(optional)</span></label>
                   <input type="email" autoComplete="email" placeholder="your.email@example.com" {...field('email')} />
                   <span className="ct-underline" aria-hidden="true" />
-                  {errors.email && <p id="contact-email-err" className="ct-error">{errors.email}</p>}
+                  {errors.email
+                    ? <p id="contact-email-err" className="ct-error">{errors.email}</p>
+                    : <p className="ct-hint">Or leave it blank and I&rsquo;ll reply by phone or WhatsApp.</p>}
                 </div>
 
                 <div className={`ct-field ct-reveal${errors.message ? ' has-error' : ''}`}>

@@ -28,11 +28,14 @@ export function clearQueue() {
 
 // Client-side validation. Matches what the Go backend will do on
 // POST /api/contact so the two agree.
-function validate({ name, email, message }) {
+// Email is optional when a phone number is given (phone-first clients);
+// a message needs at least one way to reply.
+function validate({ name, email, message, phone = '' }) {
   const errors = {}
   if (!name || !name.trim()) errors.name = 'Please enter your name.'
-  if (!email || !email.trim()) errors.email = 'Please enter your email.'
-  else if (!/^\S+@\S+\.\S+$/.test(email.trim())) errors.email = 'Please enter a valid email address.'
+  const hasEmail = Boolean(email && email.trim())
+  if (hasEmail && !/^\S+@\S+\.\S+$/.test(email.trim())) errors.email = 'Please enter a valid email address.'
+  if (!hasEmail && !(phone && phone.trim())) errors.email = 'Please give an email or a phone number so I can reply.'
   if (!message || !message.trim()) errors.message = 'Please write a short message.'
   return errors
 }
@@ -44,14 +47,14 @@ function validate({ name, email, message }) {
 //   { ok: false, status: 400|429, errors: {<field>: string} }
 // `phone` is optional here (the Contact page requires and checks it).
 export async function sendMessage({ name, email, message, phone = '' }) {
-  const clientErrors = validate({ name, email, message })
+  const clientErrors = validate({ name, email, message, phone })
   if (Object.keys(clientErrors).length) {
     return { ok: false, status: 400, errors: clientErrors }
   }
 
   const payload = {
     name: name.trim(),
-    email: email.trim(),
+    email: (email || '').trim(),
     message: message.trim(),
     ...(phone && phone.trim() ? { phone: phone.trim() } : {}),
   }

@@ -11,7 +11,8 @@ import { formatCedis } from '../data/packages.js'
 // phones = full-screen sheet with a compact summary on top. The form has
 // three sections (Your details · Date and time · Location and notes) with
 // floating labels and inline validation, and a sticky footer with the
-// total, the deposit and "Confirm booking".
+// price, the deposit (due after confirmation), a "Nothing to pay now" line
+// and "Send booking request". Full-day packages skip the time step.
 //
 // Motion (CSS: rule 10 "/packages + booking pop-up motion" and the
 // BOOKING DIALOG block in index.css; reduced motion keeps fades only):
@@ -20,14 +21,14 @@ import { formatCedis } from '../data/packages.js'
 //   sheet rises instead.
 // - Summary, header, each section and the footer appear one after another.
 // - Picking a date staggers the time-slot chips in.
-// - Confirm shows a "Confirming…" state, then a success screen with a
+// - Sending shows a "Sending request…" state, then a success screen with a
 //   drawn checkmark and the booking summary sliding in.
 // - Closing plays the opening in reverse: ×, Cancel/Close, Escape
 //   (dialog `cancel` event) or a click on the backdrop. The dialog is then
 //   closed with close(), which returns focus to the element that opened it.
 
 const CLOSE_MS = 260 // keep in sync with .bk-dialog.is-closing in CSS
-const SEND_MS = 650 // short "Confirming…" state before the success screen
+const SEND_MS = 650 // short "Sending request…" state before the success screen
 
 // Ghana's 16 regions.
 const REGIONS = [
@@ -94,19 +95,39 @@ export default function BookingModal({ pkg, onClose, origin = null, photo = null
   const slotsNeeded = slotsService.getPackageSlotCount(pkg.name)
   const deposit = Math.round(((pkg.amount || 0) * (pkg.depositPercent || 0)) / 100)
 
+  // A package that needs every slot of the day is a full-day shoot: there is
+  // only one possible time, so the time step is skipped.
+  const dailySlots = slotsService.getSettings().slots?.length || 4
+  const isFullDay = slotsNeeded >= dailySlots
+
+  // Day labels in client language ("2 free", "Free", "Full", "Off") — not
+  // the admin's slot counts — plus a spoken label for screen readers.
   const dateMeta = useMemo(() => {
     const todayIso = today.toISOString().split('T')[0]
+    const spoken = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
     return (iso) => {
-      if (iso < todayIso) return { status: 'default', disabled: true }
+      if (iso < todayIso) return { status: 'default', disabled: true, ariaLabel: `${spoken(iso)}, past date` }
       const avail = slotsService.getDayAvailability(iso)
-      if (avail.kind === 'offday') return { status: 'offday', label: 'Off', disabled: true }
-      if (avail.kind === 'blocked') return { status: 'blocked', label: 'Blocked', disabled: true }
-      const canFit = slotsService.getAvailableRuns(iso, slotsNeeded).length > 0
-      if (!canFit) return { status: 'full', label: 'Full', disabled: true }
-      return { status: avail.kind, label: `${avail.available}/${avail.total}` }
+      if (avail.kind === 'offday' || avail.kind === 'blocked') {
+        return { status: avail.kind, label: 'Off', disabled: true, ariaLabel: `${spoken(iso)}, not available` }
+      }
+      const free = slotsService.getAvailableRuns(iso, slotsNeeded).length
+      if (!free) return { status: 'full', label: 'Full', disabled: true, ariaLabel: `${spoken(iso)}, fully booked` }
+      if (isFullDay) return { status: avail.kind, label: 'Free', ariaLabel: `${spoken(iso)}, available` }
+      return {
+        status: avail.kind,
+        label: `${free} free`,
+        ariaLabel: `${spoken(iso)}, ${free} time${free === 1 ? '' : 's'} free`,
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slotsNeeded])
+  }, [slotsNeeded, isFullDay])
+
+  // Don't page back into months that are entirely in the past.
+  function changeMonth(next) {
+    const floor = today.getFullYear() * 12 + today.getMonth()
+    if (next.year * 12 + next.month >= floor) setMonthView(next)
+  }
 
   const runs = useMemo(() => {
     if (!date) return []
@@ -185,7 +206,8 @@ export default function BookingModal({ pkg, onClose, origin = null, photo = null
 
   function pickDate(iso) {
     setDate(iso)
-    setSlotRun(null)
+    // Full-day shoots have one possible time: choose it automatically.
+    setSlotRun(isFullDay ? slotsService.getAvailableRuns(iso, slotsNeeded)[0] || null : null)
     setFieldError('date', '')
     setFieldError('slot', '')
   }
@@ -244,7 +266,7 @@ export default function BookingModal({ pkg, onClose, origin = null, photo = null
         })
       } catch { /* non-browser */ }
 
-      setSubmitted({ date: day, slotLabel: run.label, location })
+      setSubmitted({ date: day, slotLabel: isFullDay ? 'Full day (timings to agree)' : run.label, location })
       setSending(false)
       setForm(emptyForm)
       setErrors({})
@@ -275,7 +297,7 @@ export default function BookingModal({ pkg, onClose, origin = null, photo = null
           <div>
             <h2 id="bk2-title" className="bk2-title">{submitted ? 'Request sent' : 'Book your session'}</h2>
             <p className="bk2-sub">
-              {submitted ? 'Thank you — here’s what you booked.' : 'Pick a date and I’ll confirm within 48 hours.'}
+              {submitted ? 'Thank you — here’s what you requested.' : 'Pick a date and I’ll confirm within 48 hours.'}
             </p>
           </div>
           <button type="button" className="bk2-close" onClick={requestClose} aria-label="Close booking dialog">
@@ -331,12 +353,16 @@ export default function BookingModal({ pkg, onClose, origin = null, photo = null
                   aria-describedby={errors.date ? 'bk2-date-err' : 'bk2-date-help'}
                 >
                   <p id="bk2-date-help" className="bk2-help">
-                    {pkg.name} takes {slotsNeeded} slot{slotsNeeded === 1 ? '' : 's'}. Greyed-out dates are closed, blocked or full.
+                    {isFullDay ? 'Full-day shoot: pick a free date.' : 'Pick a free date, then a time.'}{' '}
+                    Greyed-out dates are taken or closed. Need an evening or a Sunday? Choose the
+                    nearest date and say so in your notes, and I&rsquo;ll tell you what&rsquo;s possible.
                   </p>
                   <MonthCalendar
                     month={monthView.month}
                     year={monthView.year}
-                    onMonthChange={setMonthView}
+                    onMonthChange={changeMonth}
+                    datePicker
+                    prevDisabled={monthView.year * 12 + monthView.month <= today.getFullYear() * 12 + today.getMonth()}
                     selectedDate={date}
                     onSelectDate={pickDate}
                     dateMeta={dateMeta}
@@ -345,7 +371,16 @@ export default function BookingModal({ pkg, onClose, origin = null, photo = null
                   {errors.date && <p id="bk2-date-err" className="bk2-error" role="alert">{errors.date}</p>}
                 </div>
 
-                {date && (
+                {date && isFullDay && runs.length > 0 && (
+                  <div className="bk2-slots">
+                    <p className="bk2-slots-label">Full day · {longDate(date)}</p>
+                    <p className="bk2-help bk-slot" style={{ '--i': 0 }}>
+                      We&rsquo;ll agree the exact timings together, from preparations to the end of the day.
+                    </p>
+                  </div>
+                )}
+
+                {date && !(isFullDay && runs.length > 0) && (
                   <div className="bk2-slots">
                     <p className="bk2-slots-label" id="bk2-slots-label">Available times · {longDate(date)}</p>
                     {runs.length === 0 ? (
@@ -386,10 +421,14 @@ export default function BookingModal({ pkg, onClose, origin = null, photo = null
             </form>
 
             <footer className="bk2-foot bk-in" style={{ '--i': 4 }}>
+              {/* Reassurance at the moment of commitment: this is a request. */}
+              <p className="bk2-reassure">
+                Nothing to pay now. I&rsquo;ll confirm within 48 hours, then we arrange the deposit.
+              </p>
               <dl className="bk2-totals">
-                <div><dt>Total</dt><dd>{formatCedis(pkg.amount)}</dd></div>
+                <div><dt>Price from</dt><dd>{formatCedis(pkg.amount)}</dd></div>
                 {deposit > 0 && (
-                  <div><dt>Deposit ({pkg.depositPercent}%)</dt><dd>{formatCedis(deposit)}</dd></div>
+                  <div><dt>Deposit after I confirm ({pkg.depositPercent}%)</dt><dd>{formatCedis(deposit)}</dd></div>
                 )}
               </dl>
               <button
@@ -398,7 +437,7 @@ export default function BookingModal({ pkg, onClose, origin = null, photo = null
                 className={`bk2-confirm bk-press bk-submit${sending ? ' is-sending' : ''}`}
                 disabled={sending}
               >
-                <span>{sending ? 'Confirming…' : 'Confirm booking'}</span>
+                <span>{sending ? 'Sending request…' : 'Send booking request'}</span>
                 <span className="bk-submit-bar" aria-hidden="true" />
               </button>
               <p className="pk-sr-only" role="status">{sending ? 'Sending your booking request…' : ''}</p>
@@ -483,8 +522,8 @@ function Confirmation({ booking, pkg, deposit, onClose }) {
           <div><dt>Date</dt><dd>{longDate(booking.date)}</dd></div>
           <div><dt>Time</dt><dd>{booking.slotLabel}</dd></div>
           <div><dt>Location</dt><dd>{booking.location}</dd></div>
-          <div><dt>Total</dt><dd>{formatCedis(pkg.amount)}</dd></div>
-          {deposit > 0 && <div><dt>Deposit to confirm</dt><dd>{formatCedis(deposit)}</dd></div>}
+          <div><dt>Price from</dt><dd>{formatCedis(pkg.amount)}</dd></div>
+          {deposit > 0 && <div><dt>Deposit after I confirm</dt><dd>{formatCedis(deposit)}</dd></div>}
         </dl>
         <button type="button" className="bk2-confirm bk-press" onClick={onClose}>Done</button>
       </div>

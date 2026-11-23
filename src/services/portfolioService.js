@@ -85,6 +85,23 @@ const PACKAGE_IMAGE_SLOTS = packages.map((pkg) => ({
   defaultUrl: SEED_PHOTOS.find((p) => p.id === pkg.portfolioPhotoId)?.src || null,
 }))
 
+// Default display order (Portfolio "All" view, Home top-up): the strongest
+// people-and-local work leads — kente graduations, the beach and reception
+// weddings, Elmina and Cape Coast — then the rest in their original order.
+// Admin can still reorder; this only sets the starting order.
+const DISPLAY_ORDER = [
+  'seed_25', 'seed_22', 'seed_6', 'seed_5', 'seed_17', 'seed_23',
+  'seed_3', 'seed_18', 'seed_26', 'seed_16', 'seed_9', 'seed_19',
+]
+const rankOf = (id) => {
+  const i = DISPLAY_ORDER.indexOf(id)
+  return i >= 0 ? i + 1 : DISPLAY_ORDER.length + Number(id.replace('seed_', ''))
+}
+SEED_PHOTOS
+  .slice()
+  .sort((a, b) => rankOf(a.id) - rankOf(b.id))
+  .forEach((p, i) => { p.order = i + 1 })
+
 // Default website image slots (what the public site falls back to)
 export const SITE_IMAGE_SLOTS = [
   {
@@ -117,12 +134,15 @@ export const SITE_IMAGE_SLOTS = [
 // Browsers that saved the photo list before the bump get the new seed
 // content once; admin choices (featured, hidden, order) are kept, and any
 // later admin edits stick until the next bump.
-const SEED_REVISION = 3
+const SEED_REVISION = 4
 const SEED_REV_KEY = 'demo:portfolio:seedRevision'
 const SEED_CONTENT_FIELDS = ['src', 'thumbSrc', 'title', 'caption', 'category', 'subject']
 // Seed photos added in a revision: appended once to lists saved before it
 // (a seed deleted in admin after that is not brought back).
 const SEEDS_ADDED_IN = { 3: ['seed_22', 'seed_23', 'seed_24', 'seed_25', 'seed_26'] }
+// Revision 4 set a new default display order (DISPLAY_ORDER); lists saved
+// before it take the new order once (uploads keep their place after seeds).
+const ORDER_SET_IN = 4
 
 function refreshSeeds(list, fromRevision = 0) {
   const byId = new Map(SEED_PHOTOS.map((s) => [s.id, s]))
@@ -132,13 +152,24 @@ function refreshSeeds(list, fromRevision = 0) {
     if (Number(rev) <= fromRevision) continue
     for (const id of ids) if (!have.has(id) && byId.has(id)) added.push(byId.get(id))
   }
-  return [...list, ...added].map((p) => {
+  const applyOrder = fromRevision < ORDER_SET_IN
+  const merged = [...list, ...added].map((p) => {
     const seed = byId.get(p.id)
     if (!seed) return p
     const next = { ...p }
     for (const k of SEED_CONTENT_FIELDS) next[k] = seed[k]
+    if (applyOrder) next.order = seed.order
     return next
   })
+  if (applyOrder) {
+    // Uploads (non-seed photos) follow the seeds, keeping their own order.
+    let n = SEED_PHOTOS.length
+    merged
+      .filter((p) => !byId.has(p.id))
+      .sort((x, y) => x.order - y.order)
+      .forEach((p) => { p.order = ++n })
+  }
+  return merged
 }
 
 function loadPhotos() {

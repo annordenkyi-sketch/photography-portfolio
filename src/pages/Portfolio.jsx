@@ -32,7 +32,8 @@ import PublicFooter from '../components/PublicFooter.jsx'
 // switches use short delays so browsing feels quick.
 const ENTRANCE = { title: 180, crumbs: 300, tabs: 420, photos: 540 }
 const BROWSE = { title: 0, crumbs: 90 }
-const PHOTO_STEP = 70 // gap between photos appearing together
+const PHOTO_STEP = 70 // gap between photos appearing together (first entrance)
+const BROWSE_PHOTO_STEP = 25 // gap on later category switches: quick
 const PHOTO_STEP_CAP = 8 // never wait longer than 8 steps
 
 // Preferred hero photo per category (falls back to the first photo in
@@ -76,6 +77,9 @@ export default function Portfolio() {
     return () => clearTimeout(t)
   }, [])
   const delays = entered ? BROWSE : ENTRANCE
+  // Read inside the scroll-reveal observer callback (a closure).
+  const enteredRef = useRef(false)
+  useEffect(() => { enteredRef.current = entered }, [entered])
 
   const activeSlug = normalizeSlug(searchParams.get('category'))
   const activeLabel = slugToLabel(activeSlug) || 'All'
@@ -144,7 +148,8 @@ export default function Portfolio() {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue
         const el = entry.target
-        el.style.transitionDelay = `${Math.round(base + Math.min(step, PHOTO_STEP_CAP) * PHOTO_STEP)}ms`
+        const gap = enteredRef.current ? BROWSE_PHOTO_STEP : PHOTO_STEP
+        el.style.transitionDelay = `${Math.round(base + Math.min(step, PHOTO_STEP_CAP) * gap)}ms`
         el.classList.add('is-visible')
         io.unobserve(el)
         step += 1
@@ -156,11 +161,13 @@ export default function Portfolio() {
 
   // Hero photo crossfade: the previous photo stays underneath while the
   // new one fades in on top.
-  const [heroLayers, setHeroLayers] = useState({ prev: null, cur: null })
+  // `swap` is fixed when a layer is created (first photo: settle-zoom;
+  // later category switches: quick crossfade), so it never re-animates.
+  const [heroLayers, setHeroLayers] = useState({ prev: null, cur: null, swap: false })
   const heroSrcValue = heroPhoto ? heroPhoto.resolvedSrc : null
   useEffect(() => {
     if (!heroSrcValue) return
-    setHeroLayers((l) => (l.cur === heroSrcValue ? l : { prev: l.cur, cur: heroSrcValue }))
+    setHeroLayers((l) => (l.cur === heroSrcValue ? l : { prev: l.cur, cur: heroSrcValue, swap: enteredRef.current }))
   }, [heroSrcValue])
 
   // Sliding underline under the active category tab.
@@ -226,12 +233,13 @@ export default function Portfolio() {
       {/* ---------- Hero ---------- */}
       <header className="pf-hero">
         {heroLayers.prev && heroImg(heroLayers.prev, '', false)}
-        {heroLayers.cur && heroImg(heroLayers.cur, 'pf-hero-img--in', true)}
+        {/* First visit: fade + slow settle; later switches: quick crossfade */}
+        {heroLayers.cur && heroImg(heroLayers.cur, heroLayers.swap ? 'pf-hero-img--swap' : 'pf-hero-img--in', true)}
         <div className="pf-hero-scrim" aria-hidden="true" />
         <div className="pf-hero-content">
           <h1
             key={`t-${heroTitle}`}
-            className="pf-hero-title pf-in"
+            className={`pf-hero-title pf-in${entered ? ' is-quick' : ''}`}
             style={{ '--pf-delay': `${delays.title}ms` }}
           >
             {heroTitle}
@@ -239,7 +247,7 @@ export default function Portfolio() {
           <nav aria-label="Breadcrumb">
             <ol
               key={`c-${activeSlug}`}
-              className="pf-crumbs pf-in"
+              className={`pf-crumbs pf-in${entered ? ' is-quick' : ''}`}
               style={{ '--pf-delay': `${delays.crumbs}ms` }}
             >
               <li><Link to="/home">Home</Link></li>
@@ -299,7 +307,7 @@ export default function Portfolio() {
             <Link to="/portfolio" className="xoon-text-link">See all work →</Link>
           </div>
         ) : (
-          <ul key={activeSlug} className="pf-grid" aria-label={`${heroTitle} photos`}>
+          <ul key={activeSlug} className={`pf-grid${entered ? ' is-browsing' : ''}`} aria-label={`${heroTitle} photos`}>
             {photos.map((p, i) => (
               <li key={p.id} className="pf-reveal">
                 <button

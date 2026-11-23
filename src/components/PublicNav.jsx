@@ -3,7 +3,9 @@ import { Link, NavLink } from 'react-router-dom'
 import { useStudioProfile } from '../hooks/useStudioProfile.js'
 
 // Top menu for the dark public pages (Home, Portfolio, Packages, Contact).
-// It sits over the page hero.
+// It sits over the page hero. The four links are always visible: beside
+// the studio name on wider screens, in a full-width row under it on phones
+// (no hidden ≡ menu).
 // - `band`: a dark translucent strip behind it (bright hero photos).
 // - `overHero` + `heroRef` (Contact page only): fixed to the top; fully
 //   transparent with white text over the hero, then it fades into a solid
@@ -11,11 +13,9 @@ import { useStudioProfile } from '../hooks/useStudioProfile.js'
 //   Other pages don't pass these, so their header is unchanged.
 export default function PublicNav({ band = false, overHero = false, heroRef = null }) {
   const profile = useStudioProfile()
-  const [menuOpen, setMenuOpen] = useState(false)
   const [solid, setSolid] = useState(false)
   const studioName = profile.name || '[STUDIO NAME]'
   const navClass = ({ isActive }) => `xoon-nav-link${isActive ? ' is-active' : ''}`
-  const close = () => setMenuOpen(false)
 
   // Solid once the hero's bottom edge passes under the bar (~72px).
   useEffect(() => {
@@ -42,21 +42,11 @@ export default function PublicNav({ band = false, overHero = false, heroRef = nu
         <span className="xoon-logo-mark" aria-hidden="true">✦</span>
         <span>{studioName}</span>
       </Link>
-      <button
-        type="button"
-        className="xoon-nav-menu"
-        aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-        aria-expanded={menuOpen}
-        aria-controls="xoon-nav-links"
-        onClick={() => setMenuOpen((o) => !o)}
-      >
-        <span aria-hidden="true">{menuOpen ? '×' : '≡'}</span>
-      </button>
-      <ul id="xoon-nav-links" className={`xoon-nav-links${menuOpen ? ' is-open' : ''}`}>
-        <li><NavLink to="/home" end className={navClass} onClick={close}>Home</NavLink></li>
-        <li><NavLink to="/portfolio" className={navClass} onClick={close}>Portfolio</NavLink></li>
-        <li><NavLink to="/packages" className={navClass} onClick={close}>Packages</NavLink></li>
-        <li><NavLink to="/contact" className={navClass} onClick={close}>Contact</NavLink></li>
+      <ul className="xoon-nav-links">
+        <li><NavLink to="/home" end className={navClass}>Home</NavLink></li>
+        <li><NavLink to="/portfolio" className={navClass}>Portfolio</NavLink></li>
+        <li><NavLink to="/packages" className={navClass}>Packages</NavLink></li>
+        <li><NavLink to="/contact" className={navClass}>Contact</NavLink></li>
       </ul>
     </nav>
   )

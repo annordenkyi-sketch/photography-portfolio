@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { homeContent } from '../data/homeContent.js'
 import { useStudioProfile } from '../hooks/useStudioProfile.js'
+import { realContact } from '../services/studioProfileService.js'
 
 // Footer for the dark public pages (Home, Portfolio). Render it outside
 // <main> so it maps to the page's single contentinfo landmark (WAI-ARIA
@@ -9,10 +10,14 @@ import { useStudioProfile } from '../hooks/useStudioProfile.js'
 export default function PublicFooter() {
   const profile = useStudioProfile()
   const studioName = profile.name || '[STUDIO NAME]'
+  // Placeholder phone/email stay hidden until real ones are saved in
+  // Admin → Settings (realContact).
+  const { phone, email } = realContact(profile)
+  const [emailUser, emailDomain] = email.split('@')
 
   const igHandle = stripAt(profile.instagram)
   const tiktokHandle = stripAt(profile.tiktok)
-  const waDigits = (profile.phone || '').replace(/[^\d]/g, '')
+  const waDigits = phone.replace(/[^\d]/g, '')
   const socials = [
     igHandle && { label: 'Instagram', href: `https://instagram.com/${igHandle}`, Icon: InstagramIcon },
     tiktokHandle && { label: 'TikTok', href: `https://tiktok.com/@${tiktokHandle}`, Icon: TikTokIcon },
@@ -40,13 +45,14 @@ export default function PublicFooter() {
           </ul>
         </nav>
 
-        {(profile.phone || profile.email || profile.address) && (
+        {(phone || email || profile.address) && (
           <div className="xoon-footer-col">
             <h2 className="xoon-footer-title">Contact</h2>
             {/* <address> = the studio's contact details (MDN). */}
             <address className="xoon-footer-list">
-              {profile.phone && <a href={`tel:${profile.phone.replace(/\s+/g, '')}`}>{profile.phone}</a>}
-              {profile.email && <a href={`mailto:${profile.email}`}>{profile.email}</a>}
+              {phone && <a href={`tel:${phone.replace(/\s+/g, '')}`}>{phone}</a>}
+              {/* <wbr> lets a long address wrap after the @, not mid-word */}
+              {email && <a href={`mailto:${email}`}>{emailUser}<wbr />@{emailDomain}</a>}
               {profile.address && <span>{profile.address}</span>}
             </address>
           </div>

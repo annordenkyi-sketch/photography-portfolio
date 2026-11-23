@@ -124,7 +124,10 @@ export default function Packages() {
         }
         // Thumbnails: same pool; photos no other card shows come first.
         const candidates = pool.filter((p) => p.id !== linked?.id)
-        candidates.sort((x, y) => Number(used.has(x.id)) - Number(used.has(y.id)))
+        // Fixed tie-break by photo id (not display order), so reordering the
+        // Portfolio never changes which photos a package card shows.
+        const idRank = (id) => (/^seed_\d+$/.test(id) ? Number(id.slice(5)) : 1000)
+        candidates.sort((x, y) => (Number(used.has(x.id)) - Number(used.has(y.id))) || (idRank(x.id) - idRank(y.id)))
         const thumbs = []
         for (const p of candidates) {
           if (thumbs.length >= MAX_THUMBS) break

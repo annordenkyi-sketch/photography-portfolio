@@ -172,8 +172,9 @@ export default function Home() {
         )}
         <div className="xoon-hero-scrim" aria-hidden="true" />
         <div className="xoon-hero-content">
-          <p className="xoon-hero-eyebrow xoon-hero-anim xoon-hero-anim-1">Photography · Accra, Ghana</p>
-          <h1 className="xoon-hero-title xoon-hero-anim xoon-hero-anim-2">{studioName}</h1>
+          <h1 className="xoon-hero-title xoon-hero-anim xoon-hero-anim-1">{studioName}</h1>
+          {/* Location as a plain line under the name (no label above the heading) */}
+          <p className="xoon-hero-sub xoon-hero-anim xoon-hero-anim-2">Photography · Accra, Ghana</p>
           <div className="xoon-hero-actions xoon-hero-anim xoon-hero-anim-4">
             <Link to="/portfolio" className="xoon-btn xoon-btn--ghost">View Portfolio</Link>
             <Link to="/packages" className="xoon-btn">Book a Session</Link>
@@ -185,7 +186,6 @@ export default function Home() {
         {/* ---------- Featured work ---------- */}
         <section className="xoon-section" aria-labelledby="work-head">
           <header className="xoon-section-head xoon-reveal">
-            <p className="xoon-eyebrow">Portfolio</p>
             <h2 id="work-head" className="xoon-heading">Featured work</h2>
           </header>
           <ul className="xoon-work-grid">
@@ -222,7 +222,6 @@ export default function Home() {
         {quote && (
           <section className="xoon-section xoon-section--alt" aria-labelledby="quotes-head">
             <header className="xoon-section-head xoon-reveal">
-              <p className="xoon-eyebrow">Kind words</p>
               <h2 id="quotes-head" className="xoon-heading">{homeContent.testimonials.heading}</h2>
             </header>
             <figure className={`xoon-quote xoon-reveal${quote.image ? ' has-image' : ''}`}>

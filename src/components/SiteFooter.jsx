@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import * as studioProfile from '../services/studioProfileService.js'
+import { realContact } from '../services/studioProfileService.js'
 import { homeContent } from '../data/homeContent.js'
 
 // Public site footer. Editorial 4-column layout with:
@@ -30,9 +31,11 @@ export default function SiteFooter() {
     profile.instagram && { label: 'Instagram', href: `https://instagram.com/${stripAt(profile.instagram)}`, Icon: InstagramIcon },
   ].filter(Boolean)
 
-  const whatsappDigits = (profile.phone || '').replace(/[^\d]/g, '')
+  // Placeholder phone/email stay hidden until real ones are saved.
+  const contact = realContact(profile)
+  const whatsappDigits = contact.phone.replace(/[^\d]/g, '')
   const waHref = whatsappDigits ? `https://wa.me/${whatsappDigits}` : null
-  const telHref = profile.phone ? `tel:${profile.phone.replace(/\s+/g, '')}` : null
+  const telHref = contact.phone ? `tel:${contact.phone.replace(/\s+/g, '')}` : null
 
   const quickLinks = [
     { label: 'Home',     kind: 'route',  to: '/home' },
@@ -114,14 +117,14 @@ export default function SiteFooter() {
             {telHref && (
               <li>
                 <a href={telHref} className="site-footer-contact-link">
-                  {profile.phone}
+                  {contact.phone}
                 </a>
               </li>
             )}
             <li>
-              {profile.email ? (
-                <a href={`mailto:${profile.email}`} className="site-footer-contact-link">
-                  {profile.email}
+              {contact.email ? (
+                <a href={`mailto:${contact.email}`} className="site-footer-contact-link">
+                  {contact.email}
                 </a>
               ) : (
                 <span className="site-footer-contact-placeholder">

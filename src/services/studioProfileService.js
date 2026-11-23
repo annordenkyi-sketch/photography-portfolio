@@ -41,3 +41,14 @@ export function reset() {
 }
 
 export const CHANGED_EVENT_NAME = CHANGED_EVENT
+
+// The built-in phone and email are placeholders. Public pages show a
+// contact detail only once a real one is saved in Admin → Settings, so a
+// placeholder is never presented as real.
+export function realContact(profile) {
+  const p = profile || {}
+  return {
+    phone: p.phone && p.phone !== DEFAULT_PROFILE.phone ? p.phone : '',
+    email: p.email && p.email !== DEFAULT_PROFILE.email ? p.email : '',
+  }
+}

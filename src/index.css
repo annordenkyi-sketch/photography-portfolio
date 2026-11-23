@@ -8435,13 +8435,13 @@ body:has(.admin-shell) {
   margin: 0 auto;
   padding: 0 var(--xoon-gutter) clamp(2.5rem, 7vh, 5rem);
 }
-.xoon-hero-eyebrow {
-  margin: 0 0 0.75rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--xoon-amber);
+/* Location line under the studio name (sentence case, not a tracked label) */
+.xoon-hero-sub {
+  margin: 0.9rem 0 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(1.05rem, 0.6vw + 0.9rem, 1.3rem);
+  font-weight: 500;
+  letter-spacing: 0;
 }
 .xoon-hero-title {
   margin: 0;
@@ -8885,13 +8885,15 @@ body:has(.admin-shell) {
 .pf-crumbs li + li::before {
   content: '/';
   margin-right: 0.6rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.6);
 }
 .pf-crumbs a {
   display: inline-flex;
   align-items: center;
   min-height: 32px;
-  color: rgba(255, 255, 255, 0.72);
+  /* 0.92 + a soft shadow keeps 4.5:1 over bright parts of the hero photo */
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
   text-decoration: none;
 }
 .pf-crumbs a:hover { color: var(--xoon-amber); }
@@ -9203,9 +9205,9 @@ body:has(.admin-shell) {
   border-radius: 999px;
   background: var(--xoon-amber);
   color: var(--xoon-amber-ink);
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 .pk-badge::after {
@@ -9586,6 +9588,32 @@ body:has(.admin-shell) {
   background: rgba(232, 155, 76, 0.16);
 }
 .bk2 .month-calendar-cell--today { outline-color: rgba(232, 155, 76, 0.55); }
+/* Keyboard + palette for the booking date picker (Impeccable harden):
+   a clear amber focus ring, 44px month buttons, a disabled "Previous" on
+   the current month, and the admin status tints replaced by one neutral
+   surface (availability is spelled out in each day's label). */
+.bk2 .month-calendar-cell:focus-visible {
+  outline: 2px solid var(--xoon-amber);
+  outline-offset: 1px;
+  border-color: transparent;
+  background: rgba(232, 155, 76, 0.12);
+}
+.bk2 .month-calendar-nav {
+  width: 44px;
+  height: 44px;
+  border-color: var(--xoon-rule);
+  border-radius: 50%;
+  color: var(--xoon-ink);
+}
+.bk2 .month-calendar-nav:focus-visible { outline: 2px solid var(--xoon-amber); outline-offset: 2px; }
+.bk2 .month-calendar-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+.bk2 .month-calendar-cell--open,
+.bk2 .month-calendar-cell--partial,
+.bk2 .month-calendar-cell--pending,
+.bk2 .month-calendar-cell--full,
+.bk2 .month-calendar-cell--blocked { background: rgba(255, 255, 255, 0.04); opacity: 1; }
+.bk2 .month-calendar-cell--disabled { background: transparent; color: rgba(245, 245, 245, 0.3); }
+.bk2 .month-calendar-label { color: var(--xoon-ink-muted); }
 .bk2-slots { display: grid; gap: 0.6rem; }
 .bk2-slots-label { margin: 0; font-size: 0.85rem; font-weight: 600; }
 .bk2-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
@@ -9616,6 +9644,13 @@ body:has(.admin-shell) {
   padding: 1rem 1.75rem;
   border-top: 1px solid var(--xoon-rule);
   background: var(--xoon-surface);
+}
+.bk2-reassure {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--xoon-ink-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
 }
 .bk2-totals { display: flex; gap: 1.5rem; margin: 0; }
 .bk2-totals div { display: grid; gap: 0.1rem; }
@@ -9738,7 +9773,9 @@ body:has(.admin-shell) {
 .ct-hero-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg,
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 50%, rgba(14, 14, 18, 0.55) 0%, rgba(14, 14, 18, 0) 100%),
+    linear-gradient(180deg,
     rgba(14, 14, 18, 0.55) 0%,
     rgba(14, 14, 18, 0.35) 40%,
     rgba(14, 14, 18, 0.5) 70%,
@@ -9752,7 +9789,8 @@ body:has(.admin-shell) {
 }
 .ct-hero-title {
   margin: 0;
-  color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.55);
   font-size: clamp(2.75rem, 10vw, 8.5rem);
   font-weight: 800;
   line-height: 0.95;
@@ -9760,13 +9798,6 @@ body:has(.admin-shell) {
   text-transform: uppercase;
   text-wrap: balance;
   overflow-wrap: anywhere;
-}
-.ct-hero-text {
-  margin: 1.25rem auto 0;
-  max-width: 34rem;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.15rem);
-  line-height: 1.6;
 }
 /* Scroll cue: a slim track with a dot gliding down it */
 .ct-scroll {
@@ -9871,6 +9902,7 @@ body:has(.admin-shell) {
   text-transform: uppercase;
 }
 .ct-field label span { color: var(--xoon-amber); }
+.ct-field label .ct-optional { color: var(--xoon-ink-muted); text-transform: none; letter-spacing: 0; font-weight: 500; }
 .ct-field input,
 .ct-field textarea {
   box-sizing: border-box;
@@ -10254,9 +10286,10 @@ html[data-page-transition]::view-transition-new(root) {
 }
 .pk-reveal[data-inview] .pk-features li { opacity: 1; transform: none; }
 
-/* "Most popular" badge: a slow light sweep, then a pause */
-.pk-badge::after {
-  animation: pk-shimmer 4.2s ease-in-out 1.2s infinite !important;
+/* "Most popular" badge: one light sweep when its row comes into view */
+.pk-badge::after { animation: none !important; }
+.pk-reveal[data-inview] .pk-badge::after {
+  animation: pk-shimmer 1.6s cubic-bezier(0.4, 0, 0.2, 1) 0.7s 1 both !important;
 }
 
 /* Hover (pointer devices) + keyboard focus: lift, shadow, photo zoom,
@@ -10359,7 +10392,7 @@ html[data-page-transition]::view-transition-new(root) {
 
 @media (prefers-reduced-motion: reduce) {
   /* Fades stay (the tokens remove the movement); these stop. */
-  .pk-badge::after { animation: none !important; }
+  .pk-reveal[data-inview] .pk-badge::after { animation: none !important; }
   .pk-card:hover,
   .pk-card:focus-within,
   .pk-card:active,
@@ -10432,4 +10465,58 @@ html:has(.xoon-shell) { -webkit-tap-highlight-color: transparent; }
   .ct-submit:active,
   .xoon-work-tile:active,
   .pf-tile:active { transform: none; }
+}
+
+/* 12. Text + browsing polish (Impeccable I5, Emil E3).
+   - Body copy avoids one-word last lines.
+   - Portfolio: after the first entrance, a category switch is quick —
+     tiles fade (no slide) 25ms apart, title/breadcrumb replay at 280ms,
+     and the hero photo crossfades without the slow settle-zoom. */
+.xoon-shell p { text-wrap: pretty; }
+.pf-grid.is-browsing .pf-reveal {
+  transform: none;
+  transition: opacity 240ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.pf-in.is-quick { animation-duration: 280ms !important; }
+.pf-hero-img--swap { animation: pf-fade 450ms ease-out both !important; }
+@media (prefers-reduced-motion: reduce) {
+  .pf-hero-img--swap { animation: none !important; }
+}
+
+/* 13. Type consistency on the dark public pages (Impeccable polish).
+   Browsers don't let form controls inherit the page font (Portfolio photo
+   captions and the phone menu button were rendering in Arial), and a
+   legacy global rule sets h1–h3 to the old "Aptos, Inter" stack. Inside the
+   public shell both now inherit Manrope. :where() keeps specificity at
+   element level, so components that set their own font still win. */
+:where(.xoon-shell) :is(button, input, select, textarea) { font-family: inherit; }
+:where(.xoon-shell) :is(h1, h2, h3, h4, h5, h6) { font-family: inherit; }
+
+/* 14. Phones: the menu links stay visible (no hidden ≡ button). The studio
+   name sits on top and the four links fill a full-width pill row under it,
+   so the top-right links from desktop are still one tap away. Overrides
+   the old collapsed-menu rules above (same specificity, later in file). */
+@media (max-width: 760px) {
+  .xoon-nav { flex-wrap: wrap; row-gap: 0.6rem; }
+  .xoon-nav-links,
+  .xoon-nav-links.is-open {
+    display: flex;
+    flex-direction: row;
+    gap: 0.15rem;
+    width: 100%;
+    padding: 0.3rem;
+    border-radius: 999px;
+    background: rgba(14, 14, 18, 0.55);
+  }
+  .xoon-nav-links > li { flex: 1 1 0; min-width: 0; }
+  .xoon-nav-link {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    padding: 0.5rem 0.4rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+  }
+  /* Packages starts below the taller two-row menu, with breathing room */
+  .pk-main { padding-top: 11rem; }
 }
