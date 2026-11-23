@@ -10492,31 +10492,59 @@ html:has(.xoon-shell) { -webkit-tap-highlight-color: transparent; }
 :where(.xoon-shell) :is(button, input, select, textarea) { font-family: inherit; }
 :where(.xoon-shell) :is(h1, h2, h3, h4, h5, h6) { font-family: inherit; }
 
-/* 14. Phones: the menu links stay visible (no hidden ≡ button). The studio
-   name sits on top and the four links fill a full-width pill row under it,
-   so the top-right links from desktop are still one tap away. Overrides
-   the old collapsed-menu rules above (same specificity, later in file). */
+/* 14. Phones (≤760px): ≡ menu button that opens a panel with the four
+   links. The button: rounded square, light outline, three white lines.
+   The panel drops in under the bar (fade + slight drop, 200ms; a plain
+   fade under reduced motion) with large 52px links; the current page is
+   highlighted. Closing (link tap, outside tap, Escape, page change) is
+   handled in PublicNav.jsx. Overrides the older collapsed-menu rules. */
 @media (max-width: 760px) {
-  .xoon-nav { flex-wrap: wrap; row-gap: 0.6rem; }
-  .xoon-nav-links,
+  .xoon-nav { flex-wrap: nowrap; }
+  .xoon-nav-menu {
+    display: inline-flex;
+    width: 48px;
+    height: 48px;
+    border: 1.5px solid rgba(255, 255, 255, 0.55);
+    border-radius: 12px;
+    background: rgba(14, 14, 18, 0.35);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: #ffffff;
+  }
+  .xoon-nav-menu:focus-visible { outline: 2px solid var(--xoon-amber); outline-offset: 2px; }
+  .xoon-nav-links { display: none; }
   .xoon-nav-links.is-open {
+    position: absolute;
+    top: calc(100% - 0.25rem);
+    left: var(--xoon-gutter);
+    right: var(--xoon-gutter);
     display: flex;
-    flex-direction: row;
-    gap: 0.15rem;
-    width: 100%;
-    padding: 0.3rem;
-    border-radius: 999px;
-    background: rgba(14, 14, 18, 0.55);
+    flex-direction: column;
+    gap: 0.25rem;
+    width: auto;
+    padding: 0.5rem;
+    border: 1px solid var(--xoon-rule);
+    border-radius: 16px;
+    background: rgba(14, 14, 18, 0.96);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.75);
+    animation: xn-menu-in 200ms cubic-bezier(0.23, 1, 0.32, 1) both !important;
   }
-  .xoon-nav-links > li { flex: 1 1 0; min-width: 0; }
-  .xoon-nav-link {
+  .xoon-nav-links.is-open > li { width: 100%; }
+  .xoon-nav-links.is-open .xoon-nav-link {
     width: 100%;
-    min-height: 44px;
-    justify-content: center;
-    padding: 0.5rem 0.4rem;
-    border-radius: 999px;
-    font-size: 0.85rem;
+    min-height: 52px;
+    justify-content: flex-start;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-size: 1.05rem;
   }
-  /* Packages starts below the taller two-row menu, with breathing room */
-  .pk-main { padding-top: 11rem; }
+}
+@keyframes xn-menu-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .xoon-nav-links.is-open { animation: pk-fade-in 150ms ease-out both !important; }
 }
