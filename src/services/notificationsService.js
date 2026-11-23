@@ -5,6 +5,7 @@
 // and refresh its bell count without polling.
 // =========================================================================
 import seedNotifications from '../mock/notifications.js'
+import { refreshOnce, refreshFromSeed } from './pricingRefresh.js'
 
 const STORAGE_KEY = 'demo:notifications'
 const ADD_EVENT = 'perry:notification-added'
@@ -12,7 +13,7 @@ const ADD_EVENT = 'perry:notification-added'
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw)
+    if (raw) return refreshOnce(STORAGE_KEY, JSON.parse(raw), (list) => refreshFromSeed(list, seedNotifications, ['message']))
   } catch {
     // fall through
   }

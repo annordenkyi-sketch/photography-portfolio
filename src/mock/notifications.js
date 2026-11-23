@@ -8,7 +8,7 @@ const notifications = [
   {
     id: 'notif_001',
     type: 'new_booking',
-    message: 'Akosua Boateng booked a Standard shoot for 25 Oct',
+    message: 'Akosua Boateng booked Family & graduation for 25 Oct',
     targetType: 'booking',
     targetId: 'bk_004',
     createdAt: '2026-10-14T08:20:00Z',
@@ -17,7 +17,7 @@ const notifications = [
   {
     id: 'notif_002',
     type: 'payment_received',
-    message: 'Kwabena Appiah paid GH₵ 250 by Cash',
+    message: 'Kwabena Appiah paid GH₵ 800 by Cash',
     targetType: 'payment',
     targetId: 'pay_008',
     createdAt: '2026-10-14T05:00:00Z',
@@ -27,7 +27,7 @@ const notifications = [
   {
     id: 'notif_003',
     type: 'new_booking',
-    message: 'Nana Yaa Attah booked a Premium shoot for 21 Nov',
+    message: 'Nana Yaa Attah booked Wedding standard for 21 Nov',
     targetType: 'booking',
     targetId: 'bk_009',
     createdAt: '2026-10-13T20:10:00Z',
@@ -36,7 +36,7 @@ const notifications = [
   {
     id: 'notif_004',
     type: 'payment_received',
-    message: 'Kwame Asante paid GH₵ 500 by MoMo',
+    message: 'Kwame Asante paid GH₵ 1,500 by MoMo',
     targetType: 'payment',
     targetId: 'pay_001',
     createdAt: '2026-10-13T10:00:00Z',
@@ -46,7 +46,7 @@ const notifications = [
   {
     id: 'notif_005',
     type: 'new_booking',
-    message: 'Kofi Mensah booked an Essential shoot for 20 Oct',
+    message: 'Kofi Mensah booked Portrait session for 20 Oct',
     targetType: 'booking',
     targetId: 'bk_003',
     createdAt: '2026-10-11T16:45:00Z',
@@ -55,7 +55,7 @@ const notifications = [
   {
     id: 'notif_006',
     type: 'payment_received',
-    message: 'Ama Owusu paid GH₵ 475 by Card',
+    message: 'Ama Owusu paid GH₵ 3,000 by Card',
     targetType: 'payment',
     targetId: 'pay_012',
     createdAt: '2026-10-11T15:45:00Z',
@@ -64,7 +64,7 @@ const notifications = [
   {
     id: 'notif_007',
     type: 'new_booking',
-    message: 'Yaw Nkrumah booked a Premium shoot for 7 Nov',
+    message: 'Yaw Nkrumah booked Wedding standard for 7 Nov',
     targetType: 'booking',
     targetId: 'bk_005',
     createdAt: '2026-10-05T12:00:00Z',
@@ -73,7 +73,7 @@ const notifications = [
   {
     id: 'notif_008',
     type: 'booking_cancelled',
-    message: 'Abena Ofori cancelled her Essential shoot on 15 Sep',
+    message: 'Abena Ofori cancelled her Portrait session on 15 Sep',
     targetType: 'booking',
     targetId: 'bk_010',
     createdAt: '2026-09-12T09:00:00Z',
@@ -82,7 +82,7 @@ const notifications = [
   {
     id: 'notif_009',
     type: 'payment_received',
-    message: 'Benjamin Osei paid GH₵ 475 by Card',
+    message: 'Benjamin Osei paid GH₵ 3,000 by Card',
     targetType: 'payment',
     targetId: 'pay_016',
     createdAt: '2026-08-10T14:00:00Z',
@@ -91,7 +91,7 @@ const notifications = [
   {
     id: 'notif_010',
     type: 'payment_received',
-    message: 'Comfort Addo paid GH₵ 500 by MoMo',
+    message: 'Comfort Addo paid GH₵ 1,500 by MoMo',
     targetType: 'payment',
     targetId: 'pay_013',
     createdAt: '2026-07-18T15:00:00Z',

@@ -10,7 +10,8 @@
 // =========================================================================
 import { get as idbGet, set as idbSet, del as idbDel, keys as idbKeys } from 'idb-keyval'
 import { processImage } from '../utils/imageProcessing.js'
-import { CATEGORY_LABELS } from '../data/galleryCategories.js'
+import { CATEGORY_LABELS } from '../data/portfolioCategories.js'
+import { packages } from '../data/packages.js'
 
 const PHOTO_META_KEY = 'demo:portfolio:photos'
 const CATS_KEY = 'demo:portfolio:categories'
@@ -18,11 +19,11 @@ const SITE_META_KEY = 'demo:portfolio:siteImages'
 
 /* --- Default seed ------------------------------------------------------ */
 
-// Pulled from the shared gallery categories so admin + public + Home
+// Pulled from the shared portfolio categories so admin + public + Home
 // services section can never drift apart.
 export const DEFAULT_CATEGORIES = CATEGORY_LABELS
 
-// Seeded gallery photos — real photographs from Unsplash's CDN, served
+// Seeded portfolio photos — real photographs from Unsplash's CDN, served
 // as compressed WebP via query params (?w=1200&q=80&fm=webp&auto=format
 // &fit=crop for full image, same but w=480 for thumb). Chosen to be
 // anonymous (silhouettes, back views, hands/detail shots, empty venues,
@@ -44,12 +45,12 @@ const SEED_PHOTOS = [
   { id: 'seed_6',  category: 'Wedding',   src: u('photo-1623610641251-a3252bea79f6', 1200), thumbSrc: u('photo-1623610641251-a3252bea79f6', 480), title: 'Beach silhouette at sunset',             caption: 'Couple at golden hour',        featured: false, hidden: false, order: 6  },
 
   // --- Portrait (6) -------------------------------------------------
-  { id: 'seed_7',  category: 'Portrait',  src: u('photo-1767130298927-2df12c33e5d6', 1200), thumbSrc: u('photo-1767130298927-2df12c33e5d6', 480), title: 'Portrait studio setup',                   caption: 'Studio with softbox lighting', featured: true,  hidden: false, order: 7  },
-  { id: 'seed_8',  category: 'Portrait',  src: u('photo-1758825175271-168064c2004c', 1200), thumbSrc: u('photo-1758825175271-168064c2004c', 480), title: 'Hands holding the camera',                caption: 'Behind the lens',              featured: false, hidden: false, order: 8  },
-  { id: 'seed_9',  category: 'Portrait',  src: u('photo-1760061398084-0ec65a992725', 1200), thumbSrc: u('photo-1760061398084-0ec65a992725', 480), title: 'Professional lens close-up',              caption: 'Shoot-day gear',               featured: false, hidden: false, order: 9  },
-  { id: 'seed_10', category: 'Portrait',  src: u('flagged/photo-1576011276208-39d066a314ba', 1200), thumbSrc: u('flagged/photo-1576011276208-39d066a314ba', 480), title: 'Maternity shoot at sundown',       caption: 'Silhouette on the shore',      featured: false, hidden: false, order: 10 },
-  { id: 'seed_11', category: 'Portrait',  src: u('photo-1453137494194-411b946480fe', 1200), thumbSrc: u('photo-1453137494194-411b946480fe', 480), title: 'Lens detail',                             caption: 'Session detail',               featured: false, hidden: false, order: 11 },
-  { id: 'seed_12', category: 'Portrait',  src: u('photo-1659697067461-f9604d8f9898', 1200), thumbSrc: u('photo-1659697067461-f9604d8f9898', 480), title: 'Camera on dark backdrop',                 caption: 'Studio prep',                  featured: false, hidden: false, order: 12 },
+  { id: 'seed_7', category: 'Portrait',  src: u('photo-1655577086372-792d388e15e8', 1200), thumbSrc: u('photo-1655577086372-792d388e15e8', 480), title: 'Afro silhouette against white', caption: 'High-key studio profile', featured: true, hidden: false, order: 7 },
+  { id: 'seed_8', category: 'Portrait',  src: u('photo-1704202632056-de2c85caf4cf', 1200), thumbSrc: u('photo-1704202632056-de2c85caf4cf', 480), title: 'Rim-lit profile in the studio', caption: 'Low-key portrait', featured: false, hidden: false, order: 8 },
+  { id: 'seed_9', category: 'Portrait',  src: u('photo-1737885763392-0141b416ec1d', 1200), thumbSrc: u('photo-1737885763392-0141b416ec1d', 480), title: 'Profile against the sunset', caption: 'Golden-hour silhouette', featured: false, hidden: false, order: 9 },
+  { id: 'seed_10', category: 'Portrait', subject: 'maternity',  src: u('flagged/photo-1576011276208-39d066a314ba', 1200), thumbSrc: u('flagged/photo-1576011276208-39d066a314ba', 480), title: 'Maternity shoot at sundown',       caption: 'Silhouette on the shore',      featured: false, hidden: false, order: 10 },
+  { id: 'seed_11', category: 'Portrait',  src: u('photo-1738980420952-56cc02acd17f', 1200), thumbSrc: u('photo-1738980420952-56cc02acd17f', 480), title: 'Side profile in blue light', caption: 'Low-key studio portrait', featured: false, hidden: false, order: 11 },
+  { id: 'seed_12', category: 'Portrait',  src: u('photo-1531167560822-2c467289ab61', 1200), thumbSrc: u('photo-1531167560822-2c467289ab61', 480), title: 'Backlit in the morning sun', caption: 'Golden-hour portrait', featured: false, hidden: false, order: 12 },
 
   // --- Event (4) ----------------------------------------------------
   { id: 'seed_13', category: 'Event',     src: u('photo-1711733865005-8c0b2f1d4794', 1200), thumbSrc: u('photo-1711733865005-8c0b2f1d4794', 480), title: 'Empty auditorium ready for the event',    caption: 'Venue, before doors open',     featured: true,  hidden: false, order: 13 },
@@ -63,7 +64,26 @@ const SEED_PHOTOS = [
   { id: 'seed_19', category: 'Landscape', src: u('photo-1568025848823-86404cd04ad1', 1200), thumbSrc: u('photo-1568025848823-86404cd04ad1', 480), title: 'Accra from the air',                      caption: 'Accra, Ghana',                 featured: false, hidden: false, order: 19 },
   { id: 'seed_20', category: 'Landscape', src: u('photo-1762222630690-20a58212af83', 1200), thumbSrc: u('photo-1762222630690-20a58212af83', 480), title: 'Golden-hour coastline',                   caption: 'Rocky coast at sunset',        featured: false, hidden: false, order: 20 },
   { id: 'seed_21', category: 'Landscape', src: u('photo-1771450092348-5f33e2cc2963', 1200), thumbSrc: u('photo-1771450092348-5f33e2cc2963', 480), title: 'City skyline at dusk',                    caption: 'Aerial dusk cityscape',        featured: false, hidden: false, order: 21 },
+
+  // --- Graduation (Portrait, subject: graduation) -----------------
+  { id: 'seed_22', category: 'Portrait', subject: 'graduation', src: u('photo-1692883702706-a50fc21da44f', 1200), thumbSrc: u('photo-1692883702706-a50fc21da44f', 480), title: 'Graduates in kente stoles', caption: 'Walking to the ceremony', featured: false, hidden: false, order: 22 },
+  { id: 'seed_23', category: 'Portrait', subject: 'graduation', src: u('photo-1692883758975-cf33d6055bbe', 1200), thumbSrc: u('photo-1692883758975-cf33d6055bbe', 480), title: 'Graduate in a green gown and kente stole', caption: 'Convocation day', featured: false, hidden: false, order: 23 },
+  { id: 'seed_24', category: 'Portrait', subject: 'graduation', src: u('photo-1706901786647-206a5cc89063', 1200), thumbSrc: u('photo-1706901786647-206a5cc89063', 480), title: 'Adjusting the graduation cap', caption: 'Studio graduation portrait', featured: false, hidden: false, order: 24 },
+  { id: 'seed_25', category: 'Portrait', subject: 'graduation', src: u('photo-1627556704290-2b1f5853ff78', 1200), thumbSrc: u('photo-1627556704290-2b1f5853ff78', 480), title: 'Graduates tossing their caps', caption: 'Outside the university', featured: false, hidden: false, order: 25 },
+  { id: 'seed_26', category: 'Portrait', subject: 'graduation', src: u('photo-1631131426242-0abfa7f209c2', 1200), thumbSrc: u('photo-1631131426242-0abfa7f209c2', 480), title: 'Graduate in cap and gown', caption: 'Campus portrait', featured: false, hidden: false, order: 26 },
 ]
+
+// Package card photos: one slot per package (key `package_<id>`). Until
+// the photographer uploads a replacement, the card shows the Portfolio
+// photo named by the package's `portfolioPhotoId` (src/data/packages.js).
+export const packageImageSlotKey = (pkgId) => `package_${pkgId}`
+const PACKAGE_IMAGE_SLOTS = packages.map((pkg) => ({
+  key: packageImageSlotKey(pkg.id),
+  label: `Package: ${pkg.name}`,
+  description: `Main photo on the ${pkg.name} card on the Packages page. Until you replace it, it uses the linked Portfolio photo.`,
+  recommended: 'Best size: 1600 × 1200, landscape (4:3)',
+  defaultUrl: SEED_PHOTOS.find((p) => p.id === pkg.portfolioPhotoId)?.src || null,
+}))
 
 // Default website image slots (what the public site falls back to)
 export const SITE_IMAGE_SLOTS = [
@@ -88,14 +108,53 @@ export const SITE_IMAGE_SLOTS = [
     recommended: 'Best size: 1920 × 800, landscape',
     defaultUrl: 'https://picsum.photos/seed/perry-cta/1920/800',
   },
+  ...PACKAGE_IMAGE_SLOTS,
 ]
 
 /* --- Metadata persistence --------------------------------------------- */
 
+// Bump when SEED_PHOTOS content changes (image, title, caption, category).
+// Browsers that saved the photo list before the bump get the new seed
+// content once; admin choices (featured, hidden, order) are kept, and any
+// later admin edits stick until the next bump.
+const SEED_REVISION = 3
+const SEED_REV_KEY = 'demo:portfolio:seedRevision'
+const SEED_CONTENT_FIELDS = ['src', 'thumbSrc', 'title', 'caption', 'category', 'subject']
+// Seed photos added in a revision: appended once to lists saved before it
+// (a seed deleted in admin after that is not brought back).
+const SEEDS_ADDED_IN = { 3: ['seed_22', 'seed_23', 'seed_24', 'seed_25', 'seed_26'] }
+
+function refreshSeeds(list, fromRevision = 0) {
+  const byId = new Map(SEED_PHOTOS.map((s) => [s.id, s]))
+  const have = new Set(list.map((p) => p.id))
+  const added = []
+  for (const [rev, ids] of Object.entries(SEEDS_ADDED_IN)) {
+    if (Number(rev) <= fromRevision) continue
+    for (const id of ids) if (!have.has(id) && byId.has(id)) added.push(byId.get(id))
+  }
+  return [...list, ...added].map((p) => {
+    const seed = byId.get(p.id)
+    if (!seed) return p
+    const next = { ...p }
+    for (const k of SEED_CONTENT_FIELDS) next[k] = seed[k]
+    return next
+  })
+}
+
 function loadPhotos() {
   try {
     const raw = localStorage.getItem(PHOTO_META_KEY)
-    if (raw) return JSON.parse(raw)
+    if (raw) {
+      const list = JSON.parse(raw)
+      const storedRev = Number(localStorage.getItem(SEED_REV_KEY)) || 0
+      if (storedRev !== SEED_REVISION) {
+        const refreshed = refreshSeeds(list, storedRev)
+        savePhotos(refreshed)
+        localStorage.setItem(SEED_REV_KEY, String(SEED_REVISION))
+        return refreshed
+      }
+      return list
+    }
   } catch { /* fall through */ }
   return SEED_PHOTOS
 }

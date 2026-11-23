@@ -1,6 +1,6 @@
 ---
 name: uiux-pro-max
-description: Editorial, photography-led design system for the Perry Studios portfolio site. Load when designing or redesigning any public page (Home, Gallery, Packages, SiteFooter), building a new section, choosing colors/typography/motion, picking images, or evaluating a visual against the project's design rules. Enforces real photos only, outlined icons, Aptos typography, amber accent, generous whitespace, alternating light/dark sections, prefers-reduced-motion compliance, WebP + lazy loading, and no AI-generated decorative art (bokeh, aperture glyphs, glowing blobs).
+description: Editorial, photography-led design system for the Perry Studios portfolio site. Load when designing or redesigning any public page (Home, Portfolio, Packages, SiteFooter), building a new section, choosing colors/typography/motion, picking images, or evaluating a visual against the project's design rules. Enforces real photos only, outlined icons, Aptos typography, amber accent, generous whitespace, alternating light/dark sections, prefers-reduced-motion compliance, WebP + lazy loading, and no AI-generated decorative art (bokeh, aperture glyphs, glowing blobs).
 ---
 
 # UI/UX Pro Max — Perry Studios

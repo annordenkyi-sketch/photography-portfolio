@@ -5,8 +5,8 @@ import { homeContent } from '../data/homeContent.js'
 
 // Public site footer. Editorial 4-column layout with:
 // - Brand + socials (icon-only, outlined — Instagram only per site brief)
-// - Explore (Home / About / Gallery / Packages / Contact)
-// - What I shoot (category gallery links)
+// - Explore (Home / Portfolio / Packages / Contact)
+// - What I shoot (category portfolio links)
 // - Get in touch (click-to-call phone, email, address, WhatsApp)
 // - Bottom bar with copyright + Back to top
 export default function SiteFooter() {
@@ -34,12 +34,9 @@ export default function SiteFooter() {
   const waHref = whatsappDigits ? `https://wa.me/${whatsappDigits}` : null
   const telHref = profile.phone ? `tel:${profile.phone.replace(/\s+/g, '')}` : null
 
-  // About/Contact are in-page anchors; use <a> so hash scroll works
-  // reliably even when navigating from another route.
   const quickLinks = [
     { label: 'Home',     kind: 'route',  to: '/home' },
-    { label: 'About',    kind: 'anchor', href: '/home#about' },
-    { label: 'Gallery',  kind: 'route',  to: '/gallery' },
+    { label: 'Portfolio', kind: 'route', to: '/portfolio' },
     { label: 'Packages', kind: 'route',  to: '/packages' },
     { label: 'Contact',  kind: 'route',  to: '/contact' },
   ]
@@ -105,7 +102,7 @@ export default function SiteFooter() {
           <ul className="site-footer-links">
             {services.map((svc) => (
               <li key={svc.slug}>
-                <Link to={`/gallery?category=${svc.slug}`}>{svc.label}</Link>
+                <Link to={`/portfolio?category=${svc.slug}`}>{svc.label}</Link>
               </li>
             ))}
           </ul>

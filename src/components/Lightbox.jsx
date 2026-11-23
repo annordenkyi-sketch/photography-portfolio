@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 
 // Native <dialog>-based lightbox. Keyboard: Esc closes, ← / → move.
 // Backdrop click closes. Touch swipe left/right moves.
-export default function Lightbox({ items, startIndex = 0, onClose }) {
+// `className` adds extra classes to the dialog (Portfolio passes one that
+// turns on its open + photo-change animation).
+export default function Lightbox({ items, startIndex = 0, onClose, className = '' }) {
   const dialogRef = useRef(null)
   const touchStartX = useRef(null)
   const [index, setIndex] = useState(startIndex)
@@ -55,7 +57,7 @@ export default function Lightbox({ items, startIndex = 0, onClose }) {
   return (
     <dialog
       ref={dialogRef}
-      className="lightbox"
+      className={`lightbox${className ? ` ${className}` : ''}`}
       onClick={handleBackdrop}
       aria-label="Photo viewer"
       onTouchStart={onTouchStart}
@@ -68,7 +70,7 @@ export default function Lightbox({ items, startIndex = 0, onClose }) {
       )}
 
       <figure className="lightbox-figure">
-        <img src={current.src} alt={current.alt || ''} className="lightbox-img" />
+        <img key={current.src} src={current.src} alt={current.alt || ''} className="lightbox-img" />
         {(current.title || current.category) && (
           <figcaption className="lightbox-caption">
             {current.title && <span>{current.title}</span>}

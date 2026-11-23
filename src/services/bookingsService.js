@@ -7,13 +7,14 @@
 // public API (getAll/getById/update/add/remove/reset) stays the same.
 // =========================================================================
 import seedBookings from '../mock/bookings.js'
+import { refreshOnce, refreshBookings } from './pricingRefresh.js'
 
 const STORAGE_KEY = 'demo:bookings'
 
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw)
+    if (raw) return refreshOnce(STORAGE_KEY, JSON.parse(raw), (list) => refreshBookings(list, seedBookings))
   } catch {
     // fall through to seed
   }

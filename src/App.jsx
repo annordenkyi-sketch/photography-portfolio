@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import Home from './pages/Home.jsx'
-import Gallery from './pages/Gallery.jsx'
+import Portfolio from './pages/Portfolio.jsx'
 import Packages from './pages/Packages.jsx'
 import Book from './pages/Book.jsx'
 import Contact from './pages/Contact.jsx'
@@ -15,17 +15,26 @@ import AdminPayments from './pages/admin/AdminPayments.jsx'
 import AdminNotifications from './pages/admin/AdminNotifications.jsx'
 import AdminPortfolio from './pages/admin/AdminPortfolio.jsx'
 import AdminSettings from './pages/admin/AdminSettings.jsx'
+import { usePageTransition } from './hooks/usePageTransition.js'
+
+// Old /gallery links (including ?category=…) keep working: same query
+// string and hash, new path. Netlify also 301s /gallery on the server.
+function LegacyGalleryRedirect() {
+  const { search, hash } = useLocation()
+  return <Navigate to={{ pathname: '/portfolio', search, hash }} replace />
+}
 
 export default function App() {
   const location = useLocation()
+  usePageTransition()
   const isAdmin = location.pathname.startsWith('/admin')
 
-  // Routes mounted directly — no page-flip wrapper, no transitions. Each
-  // link opens the next page the normal way.
+  // Routes mounted directly — no page-flip wrapper. Links into /portfolio
+  // and /packages get a short fade (hooks/usePageTransition.js).
   //
   // /         redirects to /home (Cover page removed)
   // /home     Home     — CREACY-style
-  // /gallery  Gallery  — legacy
+  // /portfolio Portfolio — public photo grid (old /gallery URLs redirect here)
   // /packages Packages — legacy
   // /admin/*  Admin    — plain
   if (isAdmin) {
@@ -57,9 +66,10 @@ export default function App() {
       <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="/home" element={<Home />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/portfolio" element={<Portfolio />} />
+      <Route path="/packages" element={<Packages />} />
+      <Route path="/gallery/*" element={<LegacyGalleryRedirect />} />
       <Route element={<Layout />}>
-        <Route path="/gallery" element={<Gallery />} />
-        <Route path="/packages" element={<Packages />} />
         <Route path="/book" element={<Book />} />
       </Route>
     </Routes>

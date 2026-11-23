@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import * as portfolio from '../../services/portfolioService.js'
-import { CATEGORY_LABELS } from '../../data/galleryCategories.js'
+import { CATEGORY_LABELS } from '../../data/portfolioCategories.js'
 import { ALLOWED_TYPES, validateFile } from '../../utils/imageProcessing.js'
 import AdminWebsiteImages from './AdminWebsiteImages.jsx'
 
@@ -20,7 +20,7 @@ export default function AdminPortfolio() {
   const isWebsiteImages = location.pathname.endsWith('/website-images')
   return (
     <PortfolioShell>
-      {isWebsiteImages ? <AdminWebsiteImages /> : <GalleryManager />}
+      {isWebsiteImages ? <AdminWebsiteImages /> : <PortfolioManager />}
     </PortfolioShell>
   )
 }
@@ -36,7 +36,7 @@ function PortfolioShell({ children }) {
       </header>
       <nav className="portfolio-subnav" aria-label="Portfolio sections">
         <NavLink to="/admin/portfolio" end className="portfolio-subnav-link">
-          Gallery photos
+          Portfolio photos
         </NavLink>
         <NavLink to="/admin/portfolio/website-images" className="portfolio-subnav-link">
           Website images
@@ -48,10 +48,10 @@ function PortfolioShell({ children }) {
 }
 
 /* ======================================================================
-   Gallery manager — upload, categorise, feature, hide, delete, reorder
+   Portfolio manager — upload, categorise, feature, hide, delete, reorder
    ====================================================================== */
 
-function GalleryManager() {
+function PortfolioManager() {
   const [photos, setPhotos] = useState(() => portfolio.listPhotoMeta())
   const [categories, setCategories] = useState(() => portfolio.getCategories())
   const [activeCat, setActiveCat] = useState('All')

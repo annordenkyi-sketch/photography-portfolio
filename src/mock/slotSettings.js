@@ -12,9 +12,10 @@ const slotSettings = {
   ],
   maxBookingsPerSlot: 1,
   packageSlots: {
-    Essential: 1,
-    Standard: 2,
-    Premium: 4,
+    'Portrait session': 1,
+    'Event coverage': 2,
+    'Wedding standard': 4,
+    'Wedding premium': 4,
   },
 }
 

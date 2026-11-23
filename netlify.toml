@@ -12,6 +12,20 @@
   status = 301
   force = true
 
+# Gallery was renamed to Portfolio. 301 keeps old links (and their
+# ?category= query strings, which Netlify passes through) working.
+[[redirects]]
+  from = "/gallery"
+  to = "/portfolio"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/gallery/*"
+  to = "/portfolio"
+  status = 301
+  force = true
+
 # SPA fallback: any unknown path returns index.html so React Router works.
 [[redirects]]
   from = "/*"

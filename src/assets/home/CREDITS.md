@@ -48,14 +48,15 @@ photos are uploaded.
 
 | Where                               | Photographer       | Source                                                                                                                                                                         | License          |
 | ----------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- |
+| Home hero (default, until a photo is uploaded to the `home_hero` slot) | Iskra Photography | [unsplash.com/photos/aoAmSJKUL_M](https://unsplash.com/photos/aoAmSJKUL_M) — "A bride and groom embracing in a field at sunset" (seen from behind, no faces). Original 5442×3628; served full-frame up to 3200px wide on landscape screens and as a 9:16 crop up to 1600×2844 on portrait screens. | [Unsplash License](https://unsplash.com/license) |
 | Testimonial 1 — Wedding (Nana & Kofi) | Sabesh Photography LTD | [unsplash.com/photos/couple-silhouetted-by-a-sunset-at-the-beach-eHxsMt30i4M](https://unsplash.com/photos/couple-silhouetted-by-a-sunset-at-the-beach-eHxsMt30i4M) — "Couple silhouetted by a sunset at the beach". | [Unsplash License](https://unsplash.com/license) |
 | Testimonial 2 — Corporate portraits (Esi Agyemang) | JV | [unsplash.com/photos/a-close-up-of-a-person-tying-a-tie-3uIKaSWEUHs](https://unsplash.com/photos/a-close-up-of-a-person-tying-a-tie-3uIKaSWEUHs) — "A close up of a person tying a tie". | [Unsplash License](https://unsplash.com/license) |
 | Testimonial 3 — Family event (Benjamin Osei) | Abhishek Tirkey | [unsplash.com/photos/a-lavish-banquet-hall-is-decorated-for-an-event-4W6Np2np-ds](https://unsplash.com/photos/a-lavish-banquet-hall-is-decorated-for-an-event-4W6Np2np-ds) — "A lavish banquet hall is decorated for an event". | [Unsplash License](https://unsplash.com/license) |
-| Testimonial 4 — Maternity (Akosua Boateng) | Janko Ferlič | [unsplash.com/photos/pregnant-woman-in-silhouette-ZNVGL_Pcf74](https://unsplash.com/photos/pregnant-woman-in-silhouette-ZNVGL_Pcf74) — "A pregnant woman in silhouette holding her belly against a bright white background". | [Unsplash License](https://unsplash.com/license) |
+| Testimonial 4 — Maternity (Akosua Boateng) | Sebastian Latorre | [unsplash.com/photos/pregnant-woman-standing-on-shore-QXNugKxqqeo](https://unsplash.com/photos/pregnant-woman-standing-on-shore-QXNugKxqqeo) — "Pregnant woman standing on shore" (same photo as portfolio seed_10). | [Unsplash License](https://unsplash.com/license) |
 
 > All Unsplash License entries above: free for commercial and personal use; attribution appreciated but not required. Still credited here as a courtesy.
 
-## Gallery seed photos (public gallery grid, 21 images)
+## Portfolio seed photos (public portfolio grid, 21 images)
 
 All anonymous (silhouettes, back views, hands/detail shots, empty venues, or landscapes) so no identifiable face appears. Served via Unsplash's CDN with WebP + resize params. Admin can hide / feature / replace any of these from Admin → Portfolio.
 
@@ -74,12 +75,12 @@ All anonymous (silhouettes, back views, hands/detail shots, empty venues, or lan
 
 | Seed id | Shot | Photographer | Unsplash page | License |
 | ------- | ---- | ------------ | ------------- | ------- |
-| seed_7 | Photography studio setup with softbox lighting | Sofia Lasheva | [vhKyOG9LjqI](https://unsplash.com/photos/a-photography-studio-setup-with-lighting-equipment-vhKyOG9LjqI) | [Unsplash License](https://unsplash.com/license) |
-| seed_8 | Hands holding a camera, capturing a landscape scene | Micah & Sammie Chaffin | [TghqgLMhH90](https://unsplash.com/photos/hands-holding-camera-capturing-a-landscape-scene-TghqgLMhH90) | [Unsplash License](https://unsplash.com/license) |
-| seed_9 | Hand holding a professional camera with a large lens | rawkkim | [R_Qoc5ycrtA](https://unsplash.com/photos/hand-holding-a-professional-camera-with-a-large-lens-R_Qoc5ycrtA) | [Unsplash License](https://unsplash.com/license) |
+| seed_7 | Afro silhouette against a white background (high-key profile) | Dotun S. | [z_s_k2nxCB4](https://unsplash.com/photos/back-of-a-womans-head-z_s_k2nxCB4) | [Unsplash License](https://unsplash.com/license) |
+| seed_8 | Rim-lit woman in profile, dark studio | Sophia | [Mjm6ot0FdNE](https://unsplash.com/photos/a-silhouette-of-a-woman-in-the-dark-Mjm6ot0FdNE) | [Unsplash License](https://unsplash.com/license) |
+| seed_9 | Woman in profile against a sunset sky | Ziyao Xiong | [hkC5nW5hMgs](https://unsplash.com/photos/a-silhouette-of-a-woman-at-sunset-hkC5nW5hMgs) | [Unsplash License](https://unsplash.com/license) |
 | seed_10 | Pregnant woman standing on the shore (dusk silhouette) | Sebastian Latorre | [QXNugKxqqeo](https://unsplash.com/photos/pregnant-woman-standing-on-shore-QXNugKxqqeo) | [Unsplash License](https://unsplash.com/license) |
-| seed_11 | Selective focus of a hand holding a black camera lens | Jacob Sapp | [v8N0w1teQgM](https://unsplash.com/photos/v8N0w1teQgM) | [Unsplash License](https://unsplash.com/license) |
-| seed_12 | A hand holding a camera | Marcin Kempa | [5mY3JSYFH1M](https://unsplash.com/photos/a-hand-holding-a-camera-5mY3JSYFH1M) | [Unsplash License](https://unsplash.com/license) |
+| seed_11 | Man in side profile, blue rim light | Cemrecan Yurtman | [EAmyRE5_2lM](https://unsplash.com/photos/a-silhouette-of-a-person-in-the-dark-EAmyRE5_2lM) | [Unsplash License](https://unsplash.com/license) |
+| seed_12 | Woman backlit by morning sun, face hidden | Tiffany Combs | [aQld4blsXoA](https://unsplash.com/photos/silhouette-photo-of-woman-during-daytime-aQld4blsXoA) | [Unsplash License](https://unsplash.com/license) |
 
 ### Event (4)
 
@@ -99,3 +100,21 @@ All anonymous (silhouettes, back views, hands/detail shots, empty venues, or lan
 | seed_19 | Aerial photography of Accra, Ghana | Virgyl Sowah | [E9NPWGBXM9o](https://unsplash.com/photos/E9NPWGBXM9o) | [Unsplash License](https://unsplash.com/license) |
 | seed_20 | Golden hour illuminating a rocky coastline with crashing waves | Kellen Riggin | [9jTkTV7E51I](https://unsplash.com/photos/golden-hour-illuminates-rocky-coastline-with-crashing-waves-9jTkTV7E51I) | [Unsplash License](https://unsplash.com/license) |
 | seed_21 | Aerial view of a city skyline at dusk | Klaus Birner | [3mdHgIGJdrM](https://unsplash.com/photos/aerial-view-of-a-city-skyline-at-dusk-3mdHgIGJdrM) | [Unsplash License](https://unsplash.com/license) |
+
+### Graduation (Portrait, tagged `graduation`) — Family & graduation package (5)
+
+Identifiable people: Unsplash provides no model release.
+
+| Seed id | Shot | Photographer | Unsplash page | License |
+| ------- | ---- | ------------ | ------------- | ------- |
+| seed_22 | Two graduates in green gowns and kente stoles walking across campus | Raymond Owusu-Afriyie | [PCYPAmfyvvs](https://unsplash.com/photos/two-women-in-graduation-gowns-walking-down-a-street-PCYPAmfyvvs) | [Unsplash License](https://unsplash.com/license) |
+| seed_23 | Graduate in a green gown and kente stole, side profile | Raymond Owusu-Afriyie | [dGNvkOOCWeQ](https://unsplash.com/photos/a-woman-in-a-graduation-gown-is-walking-down-the-street-dGNvkOOCWeQ) | [Unsplash License](https://unsplash.com/license) |
+| seed_24 | Graduate seen from behind adjusting her cap, studio backdrop | Emediong Umoh | [biVOjoZb4c](https://unsplash.com/photos/a-woman-wearing-a-graduation-gown-and-a-black-hat--biVOjoZb4c) | [Unsplash License](https://unsplash.com/license) |
+| seed_25 | Graduates tossing their caps in front of a university building | Rut Miit | [hpRGrfOIybc](https://unsplash.com/photos/graduates-throwing-caps-in-celebration-hpRGrfOIybc) | [Unsplash License](https://unsplash.com/license) |
+| seed_26 | Graduate in cap and gown on campus steps (Uganda Martyrs University) | Askas Jeremy | [HmX3neVpUPs](https://unsplash.com/photos/a-man-in-a-graduation-cap-and-gown-HmX3neVpUPs) | [Unsplash License](https://unsplash.com/license) |
+
+## Contact page
+
+| Where | Photographer | Source | License |
+| ----- | ------------ | ------ | ------- |
+| Contact hero (`/contact`) — hand holding a professional camera with a large white telephoto lens | rawkkim | [unsplash.com/photos/R_Qoc5ycrtA](https://unsplash.com/photos/hand-holding-a-professional-camera-with-a-large-lens-R_Qoc5ycrtA) | [Unsplash License](https://unsplash.com/license) |

@@ -9,6 +9,7 @@
 // automatically propagate to the calendar.
 // =========================================================================
 import defaultSettings from '../mock/slotSettings.js'
+import { refreshOnce, refreshSlotSettings, fallbackSlotCount } from './pricingRefresh.js'
 import defaultBlocks from '../mock/blockedDates.js'
 import * as bookingsService from './bookingsService.js'
 
@@ -19,7 +20,7 @@ const BLOCKS_KEY = 'demo:blockedDates'
 function loadSettings() {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY)
-    if (raw) return JSON.parse(raw)
+    if (raw) return refreshOnce(SETTINGS_KEY, JSON.parse(raw), (s) => refreshSlotSettings(s, defaultSettings))
   } catch {
     // fall through
   }
@@ -88,7 +89,7 @@ export function isWorkingDay(date) {
 
 export function getPackageSlotCount(packageName) {
   const settings = loadSettings()
-  return settings.packageSlots[packageName] || 1
+  return settings.packageSlots?.[packageName] || fallbackSlotCount(packageName)
 }
 
 /* --- Mutations: blocking ---------------------------------------------- */

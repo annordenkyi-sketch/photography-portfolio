@@ -3,13 +3,14 @@
 // Same localStorage-overlay pattern as bookingsService.
 // =========================================================================
 import seedPayments from '../mock/payments.js'
+import { refreshOnce, refreshFromSeed } from './pricingRefresh.js'
 
 const STORAGE_KEY = 'demo:payments'
 
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw)
+    if (raw) return refreshOnce(STORAGE_KEY, JSON.parse(raw), (list) => refreshFromSeed(list, seedPayments, ['amount']))
   } catch {
     // fall through
   }

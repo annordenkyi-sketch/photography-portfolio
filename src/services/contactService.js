@@ -42,7 +42,8 @@ function validate({ name, email, message }) {
 //     - 'backend': delivered via /api/contact (server returned 200)
 //     - 'queued':  server unreachable; stored locally to resend later
 //   { ok: false, status: 400|429, errors: {<field>: string} }
-export async function sendMessage({ name, email, message }) {
+// `phone` is optional here (the Contact page requires and checks it).
+export async function sendMessage({ name, email, message, phone = '' }) {
   const clientErrors = validate({ name, email, message })
   if (Object.keys(clientErrors).length) {
     return { ok: false, status: 400, errors: clientErrors }
@@ -52,6 +53,7 @@ export async function sendMessage({ name, email, message }) {
     name: name.trim(),
     email: email.trim(),
     message: message.trim(),
+    ...(phone && phone.trim() ? { phone: phone.trim() } : {}),
   }
 
   try {

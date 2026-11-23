@@ -1,63 +1,72 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { homeContent } from '../data/homeContent.js'
-import { CONTENT_CATEGORIES } from '../data/galleryCategories.js'
 import * as portfolio from '../services/portfolioService.js'
-import * as studioProfile from '../services/studioProfileService.js'
+import { useStudioProfile } from '../hooks/useStudioProfile.js'
+import Lightbox from '../components/Lightbox.jsx'
+import PublicNav from '../components/PublicNav.jsx'
+import PublicFooter from '../components/PublicFooter.jsx'
 
-// CREACY-style landing page.
-// 4 sections only: Nav → Hero → Category rail → Footer.
-// Dark charcoal shell, white type, white chip CTAs, Manrope sans. No 3D
-// effects anywhere; only standard hover/focus color changes. Styles from
-// --cre-* tokens in src/index.css.
-const DEFAULT_HERO = 'https://picsum.photos/seed/perry-home/1920/1080'
+// Landing page: hero → featured work → testimonials →
+// final call to action → footer.
+const unsplash = (id, w) =>
+  `https://images.unsplash.com/${id}?w=${w}&q=80&fm=webp&auto=format&fit=crop`
+// Bride and groom walking into a golden-hour field — Iskra Photography
+// (CREDITS.md). Original is 5442×3628 (landscape), so:
+// - wide screens get the full frame, up to 3200px wide for large /
+//   high-density displays
+// - portrait screens (phones, upright tablets) get a server-side 9:16
+//   crop centred on the couple, up to 1600×2844 (inside the original's
+//   3628px height, so it's never upscaled)
+const HERO_ID = 'photo-1711968558574-3cdc2a947f30'
+const heroWide = (w) => `https://images.unsplash.com/${HERO_ID}?w=${w}&q=80&fm=webp`
+const heroTall = (w) =>
+  `https://images.unsplash.com/${HERO_ID}?w=${w}&h=${Math.round((w * 16) / 9)}&fit=crop&crop=focalpoint&fp-x=0.48&fp-y=0.5&q=80&fm=webp`
+const HERO_SRC = heroWide(1920)
+const HERO_WIDE_SRCSET = [800, 1280, 1920, 2400, 3200].map((w) => `${heroWide(w)} ${w}w`).join(', ')
+const HERO_TALL_SRCSET = [640, 960, 1280, 1600].map((w) => `${heroTall(w)} ${w}w`).join(', ')
+const MAX_FEATURED = 9
+
+function initials(name) {
+  return (name || '')
+    .replace(/\[PLACEHOLDER\]\s*/g, '')
+    .split(/[\s&]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('')
+}
 
 export default function Home() {
-  const [profile, setProfile] = useState(() => studioProfile.getProfile())
-  const [heroImage, setHeroImage] = useState(DEFAULT_HERO)
-  const [featured, setFeatured] = useState([])
-  const [publicPhotos, setPublicPhotos] = useState([])
-  const [slideIndex, setSlideIndex] = useState(0)
+  // No preload() here: it can't carry a media query, so it would fetch the
+  // wide crop on phones too. fetchPriority="high" on the <img> covers it.
+  const heroCustomized = portfolio.isSiteImageCustomized('home_hero')
 
-  useEffect(() => {
-    function refresh() { setProfile(studioProfile.getProfile()) }
-    window.addEventListener(studioProfile.CHANGED_EVENT_NAME, refresh)
-    window.addEventListener('storage', refresh)
-    return () => {
-      window.removeEventListener(studioProfile.CHANGED_EVENT_NAME, refresh)
-      window.removeEventListener('storage', refresh)
-    }
-  }, [])
+  const profile = useStudioProfile()
+  const [heroUpload, setHeroUpload] = useState(null)
+  const [photos, setPhotos] = useState([])
+  const [featured, setFeatured] = useState([])
+  const [lightboxIndex, setLightboxIndex] = useState(null)
+  const [quoteIndex, setQuoteIndex] = useState(0)
 
   useEffect(() => {
     let cancelled = false
     const revokes = []
+    const track = (url) => {
+      if (url && typeof url === 'string' && url.startsWith('blob:')) revokes.push(url)
+      return url
+    }
     async function load() {
-      try {
-        const url = await portfolio.getSiteImageUrl('home_hero')
-        if (!cancelled && url) {
-          setHeroImage(url)
-          if (url.startsWith('blob:')) revokes.push(url)
-        }
-      } catch { /* use default */ }
-
-      const featList = portfolio.listFeaturedPhotos().slice(0, 3)
-      const feats = await Promise.all(featList.map(async (p) => {
-        const url = (await portfolio.resolveThumbUrl?.(p)) ?? p.thumbSrc ?? p.src
-        if (url && typeof url === 'string' && url.startsWith('blob:')) revokes.push(url)
-        return { ...p, resolvedSrc: url }
-      }))
-
-      const pubList = portfolio.listPublicPhotos()
-      const pubs = await Promise.all(pubList.map(async (p) => {
-        const url = (await portfolio.resolveThumbUrl?.(p)) ?? p.thumbSrc ?? p.src
-        if (url && typeof url === 'string' && url.startsWith('blob:')) revokes.push(url)
-        return { ...p, resolvedSrc: url }
-      }))
-
+      if (heroCustomized) {
+        const url = track(await portfolio.getSiteImageUrl('home_hero'))
+        if (!cancelled && url) setHeroUpload(url)
+      }
+      const resolve = async (p) => ({ ...p, resolvedSrc: track(await portfolio.resolveFullUrl(p)) })
+      const pubs = await Promise.all(portfolio.listPublicPhotos().map(resolve))
+      const feats = await Promise.all(portfolio.listFeaturedPhotos().map(resolve))
       if (!cancelled) {
-        setFeatured(feats)
-        setPublicPhotos(pubs)
+        setPhotos(pubs.filter((p) => p.resolvedSrc))
+        setFeatured(feats.filter((p) => p.resolvedSrc))
       }
     }
     load()
@@ -65,200 +74,218 @@ export default function Home() {
       cancelled = true
       for (const u of revokes) URL.revokeObjectURL(u)
     }
-  }, [])
+  }, [heroCustomized])
 
-  const name = profile.name || '[STUDIO NAME]'
-  const tagline = profile.tagline || 'Photography across Accra and beyond.'
-  const contactHref = '/contact'
+  // Re-scan after photos arrive: blocks that render late must be observed too,
+  // otherwise they stay at opacity 0.
+  useEffect(() => {
+    const els = document.querySelectorAll('.xoon-reveal:not(.is-visible)')
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced || typeof IntersectionObserver === 'undefined') {
+      els.forEach((el) => el.classList.add('is-visible'))
+      return undefined
+    }
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible')
+          io.unobserve(entry.target)
+        }
+      }
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' })
+    els.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [photos, featured])
 
-  const railCategories = CONTENT_CATEGORIES.slice(0, 3)
-  const railCards = railCategories.map((cat) => {
-    const match = publicPhotos.find(
-      (p) => (p.category || '').toLowerCase() === cat.label.toLowerCase(),
-    )
-    return { ...cat, image: match?.resolvedSrc || null }
-  })
+  const studioName = profile.name || '[STUDIO NAME]'
 
-  const slideCount = Math.max(featured.length, 1)
-  function prevSlide() { setSlideIndex((i) => (i - 1 + slideCount) % slideCount) }
-  function nextSlide() { setSlideIndex((i) => (i + 1) % slideCount) }
-  const paginatorFill = `${Math.round(((slideIndex + 1) / slideCount) * 100)}%`
+  // Admin-featured photos first, topped up with other public photos.
+  const gridPhotos = [...featured]
+  for (const p of photos) {
+    if (gridPhotos.length >= MAX_FEATURED) break
+    if (!gridPhotos.some((g) => g.id === p.id)) gridPhotos.push(p)
+  }
+  const lightboxItems = gridPhotos.map((p) => ({
+    src: p.resolvedSrc,
+    alt: p.title || p.category,
+    title: p.title,
+    category: p.category,
+  }))
+
+  const ctaPhoto = photos.find((p) => p.id === 'seed_20')
+    || photos.find((p) => !gridPhotos.some((g) => g.id === p.id))
+    || photos[photos.length - 1]
+    || null
+
+  const testimonials = homeContent.testimonials.items
+  const quote = testimonials[quoteIndex] || null
+  const prevQuote = () => setQuoteIndex((i) => (i - 1 + testimonials.length) % testimonials.length)
+  const nextQuote = () => setQuoteIndex((i) => (i + 1) % testimonials.length)
 
   return (
-    <div className="cre-shell">
-      {/* ---------- Nav ---------- */}
-      <nav className="cre-nav" aria-label="Primary">
-        <Link to="/home" className="cre-brand">{name}</Link>
-        <div className="cre-nav-pill">
-          <NavLink to="/home" end className={({ isActive }) => `cre-nav-link${isActive ? ' is-active' : ''}`}>
-            Home
-          </NavLink>
-          <NavLink to="/gallery" className={({ isActive }) => `cre-nav-link${isActive ? ' is-active' : ''}`}>
-            Service
-          </NavLink>
-          <NavLink to="/packages" className={({ isActive }) => `cre-nav-link${isActive ? ' is-active' : ''}`}>
-            Projects
-          </NavLink>
-          <NavLink to={contactHref} className={({ isActive }) => `cre-nav-link${isActive ? ' is-active' : ''}`}>
-            Contact Us
-          </NavLink>
-        </div>
-        <Link to="/packages" className="cre-cta" aria-label="Book a call">
-          Book a Call
-          <span aria-hidden="true" className="cre-cta-arrow">↗</span>
-        </Link>
-      </nav>
+    <div className="xoon-shell" id="top">
+      <a href="#main" className="xoon-skip">Skip to content</a>
+
+      <PublicNav />
 
       {/* ---------- Hero ---------- */}
-      <section className="cre-hero" aria-label="Hero">
-        <img
-          className="cre-hero-bg"
-          src={heroImage}
-          alt=""
-          fetchPriority="high"
-          aria-hidden="true"
-        />
-        <div className="cre-hero-scrim" aria-hidden="true" />
-        <div className="cre-hero-inner">
-          <h1 className="cre-hero-headline">{tagline}</h1>
-          <div className="cre-hero-row">
-            <ul className="cre-hero-pills" aria-label="What I shoot">
-              {CONTENT_CATEGORIES.map((cat) => (
-                <li key={cat.slug}>
-                  <Link to={`/gallery?category=${cat.slug}`} className="cre-hero-pill">
-                    {cat.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+      <header className="xoon-hero">
+        {heroUpload ? (
+          <img
+            className="xoon-hero-img"
+            src={heroUpload}
+            width="1920"
+            height="1280"
+            alt=""
+            fetchPriority="high"
+            decoding="async"
+          />
+        ) : (
+          <picture>
+            <source media="(orientation: portrait)" type="image/webp" srcSet={HERO_TALL_SRCSET} sizes="100vw" />
+            <source type="image/webp" srcSet={HERO_WIDE_SRCSET} sizes="100vw" />
+            <img
+              className="xoon-hero-img"
+              src={HERO_SRC}
+              width="1920"
+              height="1280"
+              alt=""
+              fetchPriority="high"
+              decoding="async"
+            />
+          </picture>
+        )}
+        <div className="xoon-hero-scrim" aria-hidden="true" />
+        <div className="xoon-hero-content">
+          <p className="xoon-hero-eyebrow xoon-hero-anim xoon-hero-anim-1">Photography · Accra, Ghana</p>
+          <h1 className="xoon-hero-title xoon-hero-anim xoon-hero-anim-2">{studioName}</h1>
+          <div className="xoon-hero-actions xoon-hero-anim xoon-hero-anim-4">
+            <Link to="/portfolio" className="xoon-btn xoon-btn--ghost">View Portfolio</Link>
+            <Link to="/packages" className="xoon-btn">Book a Session</Link>
+          </div>
+        </div>
+      </header>
 
-            {featured.length > 0 && (
-              <div className="cre-hero-carousel">
-                <div className="cre-hero-paginator">
-                  <button
-                    type="button"
-                    className="cre-hero-paginator-btn"
-                    onClick={prevSlide}
-                    aria-label="Previous featured photo"
-                  >
-                    ‹
-                  </button>
-                  <span>{String(slideIndex + 1).padStart(2, '0')}</span>
-                  <span
-                    className="cre-hero-paginator-bar"
-                    style={{ '--cre-paginator-fill': paginatorFill }}
-                    aria-hidden="true"
+      <main id="main">
+        {/* ---------- Featured work ---------- */}
+        <section className="xoon-section" aria-labelledby="work-head">
+          <header className="xoon-section-head xoon-reveal">
+            <p className="xoon-eyebrow">Portfolio</p>
+            <h2 id="work-head" className="xoon-heading">Featured work</h2>
+          </header>
+          <ul className="xoon-work-grid">
+            {gridPhotos.map((p, i) => (
+              <li key={p.id} className="xoon-reveal">
+                <button
+                  type="button"
+                  className="xoon-work-tile xoon-photo"
+                  onClick={() => setLightboxIndex(i)}
+                  aria-label={`Open ${p.title || p.category} full size`}
+                >
+                  <img
+                    src={p.resolvedSrc}
+                    alt={p.title || p.category}
+                    width="800"
+                    height="1000"
+                    loading="lazy"
+                    decoding="async"
                   />
-                  <span>{String(slideCount).padStart(2, '0')}</span>
-                  <button
-                    type="button"
-                    className="cre-hero-paginator-btn"
-                    onClick={nextSlide}
-                    aria-label="Next featured photo"
-                  >
-                    ›
-                  </button>
-                </div>
-                <div className="cre-hero-slides" aria-live="polite">
-                  {featured.map((p, i) => {
-                    const show = i === slideIndex || i === (slideIndex + 1) % slideCount
-                    return (
-                      <article
-                        key={p.id}
-                        className="cre-hero-slide"
-                        hidden={!show}
-                      >
-                        {p.resolvedSrc && (
-                          <img src={p.resolvedSrc} alt={p.title || p.category} loading="lazy" />
-                        )}
-                        <div className="cre-hero-slide-body">
-                          <p className="cre-hero-slide-title">{p.title || p.category}</p>
-                          <p className="cre-hero-slide-caption">
-                            {p.caption || `${p.category} · ${name}`}
-                          </p>
-                        </div>
-                      </article>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="xoon-center xoon-reveal">
+            <Link to="/portfolio" className="xoon-text-link">View full portfolio →</Link>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ---------- Category rail (3 vertical photo cards) ---------- */}
-      <section className="cre-rail" aria-labelledby="rail-head">
-        <p id="rail-head" className="cre-eyebrow">
-          <span className="cre-eyebrow-num">(02)</span> Featured categories
-        </p>
-        <div className="cre-rail-grid">
-          {railCards.map((card) => (
-            <Link
-              key={card.slug}
-              to={`/gallery?category=${card.slug}`}
-              className="cre-rail-card"
-              aria-label={`Open the ${card.label} gallery`}
-            >
-              {card.image && (
-                <img src={card.image} alt={`${card.label} photography sample`} loading="lazy" />
+        {/* ---------- Testimonials ---------- */}
+        {quote && (
+          <section className="xoon-section xoon-section--alt" aria-labelledby="quotes-head">
+            <header className="xoon-section-head xoon-reveal">
+              <p className="xoon-eyebrow">Kind words</p>
+              <h2 id="quotes-head" className="xoon-heading">{homeContent.testimonials.heading}</h2>
+            </header>
+            <figure className={`xoon-quote xoon-reveal${quote.image ? ' has-image' : ''}`}>
+              {quote.image && (
+                <div className="xoon-quote-media">
+                  <img
+                    key={quote.id}
+                    src={quote.image}
+                    alt={quote.imageAlt || ''}
+                    width="800"
+                    height="800"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
               )}
-              <div className="cre-rail-card-body">
-                <h3 className="cre-rail-card-title">{card.label}</h3>
-                <span className="cre-cta" aria-hidden="true">
-                  More Details
-                  <span className="cre-cta-arrow">↗</span>
+              <div className="xoon-quote-body">
+              <blockquote className="xoon-quote-text" aria-live="polite">
+                &ldquo;{quote.quote}&rdquo;
+              </blockquote>
+              <figcaption className="xoon-quote-cite">
+                <span className="xoon-quote-avatar" aria-hidden="true">{initials(quote.name)}</span>
+                <span>
+                  <span className="xoon-quote-name">{quote.name}</span>
+                  <span className="xoon-quote-role">{quote.role}</span>
                 </span>
+              </figcaption>
+              {testimonials.length > 1 && (
+                <div className="xoon-quote-controls">
+                  <button type="button" className="xoon-quote-arrow" onClick={prevQuote} aria-label="Previous testimonial">‹</button>
+                  <div className="xoon-quote-dots" role="group" aria-label="Choose testimonial">
+                    {testimonials.map((t, i) => (
+                      <button
+                        key={t.id || i}
+                        type="button"
+                        className={`xoon-quote-dot${i === quoteIndex ? ' is-active' : ''}`}
+                        aria-label={`Testimonial ${i + 1} of ${testimonials.length}`}
+                        aria-pressed={i === quoteIndex}
+                        onClick={() => setQuoteIndex(i)}
+                      />
+                    ))}
+                  </div>
+                  <button type="button" className="xoon-quote-arrow" onClick={nextQuote} aria-label="Next testimonial">›</button>
+                </div>
+              )}
               </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+            </figure>
+          </section>
+        )}
 
-      {/* ---------- Footer ---------- */}
-      <footer className="cre-footer" role="contentinfo">
-        <div className="cre-footer-top">
-          <div className="cre-footer-brand">
-            <h2>{name}</h2>
-            <p>
-              {homeContent.footer.tagline || 'Photography across Accra and beyond.'}{' '}
-              {homeContent.footer.smallPrint}
-            </p>
-            <Link to="/packages" className="cre-cta" aria-label="Book a call from the footer">
-              Book a Call
-              <span aria-hidden="true" className="cre-cta-arrow">↗</span>
-            </Link>
+        {/* ---------- Final call to action ---------- */}
+        <section className="xoon-cta xoon-reveal" aria-labelledby="cta-head">
+          {ctaPhoto && (
+            <img
+              className="xoon-cta-img"
+              src={ctaPhoto.resolvedSrc}
+              alt=""
+              width="1600"
+              height="900"
+              loading="lazy"
+              decoding="async"
+            />
+          )}
+          <div className="xoon-cta-scrim" aria-hidden="true" />
+          <div className="xoon-cta-content">
+            <h2 id="cta-head" className="xoon-heading">Ready to book your session?</h2>
+            <p className="xoon-cta-text">Pick a package and a date — I&rsquo;ll confirm within 48 hours.</p>
+            <Link to="/packages" className="xoon-btn">Book a Session</Link>
           </div>
-          <nav className="cre-footer-col" aria-label="Site">
-            <h3>Site</h3>
-            <ul>
-              <li><Link to="/home">Home</Link></li>
-              <li><Link to="/gallery">Gallery</Link></li>
-              <li><Link to="/packages">Packages</Link></li>
-            </ul>
-          </nav>
-          <div id="site-footer-contact" className="cre-footer-col">
-            <h3>Contact</h3>
-            <ul>
-              {profile.phone && (
-                <li>
-                  <a href={`tel:${profile.phone.replace(/\s+/g, '')}`}>{profile.phone}</a>
-                </li>
-              )}
-              {profile.email && (
-                <li>
-                  <a href={`mailto:${profile.email}`}>{profile.email}</a>
-                </li>
-              )}
-              {profile.address && <li>{profile.address}</li>}
-            </ul>
-          </div>
-        </div>
-        <div className="cre-footer-bottom">
-          <p>© {new Date().getFullYear()} {name}. All rights reserved.</p>
-          <p>Accra &middot; Ghana</p>
-        </div>
-      </footer>
+        </section>
+      </main>
+
+      <PublicFooter />
+
+      {lightboxIndex != null && lightboxItems.length > 0 && (
+        <Lightbox
+          items={lightboxItems}
+          startIndex={Math.min(lightboxIndex, lightboxItems.length - 1)}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
     </div>
   )
 }
+

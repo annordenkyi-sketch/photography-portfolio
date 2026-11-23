@@ -7,7 +7,7 @@ const payments = [
   {
     id: 'pay_001',
     bookingId: 'bk_001',
-    amount: 500,
+    amount: 1500,
     method: 'momo',
     date: '2026-10-09T10:00:00Z',
     status: 'paid',
@@ -16,7 +16,7 @@ const payments = [
   {
     id: 'pay_002',
     bookingId: 'bk_002',
-    amount: 475,
+    amount: 3000,
     method: 'bank',
     date: '2026-09-20T14:00:00Z',
     status: 'deposit_paid',
@@ -25,7 +25,7 @@ const payments = [
   {
     id: 'pay_003',
     bookingId: 'bk_005',
-    amount: 475,
+    amount: 3000,
     method: 'card',
     date: '2026-10-06T09:30:00Z',
     status: 'deposit_paid',
@@ -34,7 +34,7 @@ const payments = [
   {
     id: 'pay_004',
     bookingId: 'bk_006',
-    amount: 500,
+    amount: 1500,
     method: 'cash',
     date: '2026-09-28T14:00:00Z',
     status: 'paid',
@@ -43,7 +43,7 @@ const payments = [
   {
     id: 'pay_005',
     bookingId: 'bk_007',
-    amount: 250,
+    amount: 800,
     method: 'momo',
     date: '2026-09-20T16:30:00Z',
     status: 'paid',
@@ -52,7 +52,7 @@ const payments = [
   {
     id: 'pay_006',
     bookingId: 'bk_008',
-    amount: 250,
+    amount: 750,
     method: 'momo',
     date: '2026-10-02T11:00:00Z',
     status: 'deposit_paid',
@@ -61,7 +61,7 @@ const payments = [
   {
     id: 'pay_007',
     bookingId: 'bk_011',
-    amount: 500,
+    amount: 1500,
     method: 'bank',
     date: '2026-10-05T10:00:00Z',
     status: 'paid',
@@ -70,7 +70,7 @@ const payments = [
   {
     id: 'pay_008',
     bookingId: 'bk_012',
-    amount: 250,
+    amount: 800,
     method: 'cash',
     date: '2026-10-10T15:00:00Z',
     status: 'paid',
@@ -79,7 +79,7 @@ const payments = [
   {
     id: 'pay_009',
     bookingId: 'bk_005',
-    amount: 475,
+    amount: 3000,
     method: 'momo',
     date: '2026-10-10T09:00:00Z',
     status: 'paid',
@@ -88,7 +88,7 @@ const payments = [
   {
     id: 'pay_010',
     bookingId: 'bk_010',
-    amount: 250,
+    amount: 800,
     method: 'momo',
     date: '2026-09-05T12:00:00Z',
     status: 'refunded',
@@ -99,7 +99,7 @@ const payments = [
   {
     id: 'pay_011',
     bookingId: 'bk_004',
-    amount: 150,
+    amount: 450,
     method: 'cash',
     date: '2026-10-13T11:00:00Z',
     status: 'deposit_paid',
@@ -108,7 +108,7 @@ const payments = [
   {
     id: 'pay_012',
     bookingId: 'bk_002',
-    amount: 475,
+    amount: 3000,
     method: 'card',
     date: '2026-10-11T15:45:00Z',
     status: 'paid',
@@ -117,7 +117,7 @@ const payments = [
   {
     id: 'pay_013',
     bookingId: 'bk_013',
-    amount: 500,
+    amount: 1500,
     method: 'momo',
     date: '2026-07-18T15:00:00Z',
     status: 'paid',
@@ -126,7 +126,7 @@ const payments = [
   {
     id: 'pay_014',
     bookingId: 'bk_014',
-    amount: 250,
+    amount: 800,
     method: 'cash',
     date: '2026-08-05T12:30:00Z',
     status: 'paid',
@@ -135,7 +135,7 @@ const payments = [
   {
     id: 'pay_015',
     bookingId: 'bk_015',
-    amount: 475,
+    amount: 3000,
     method: 'bank',
     date: '2026-07-20T10:15:00Z',
     status: 'deposit_paid',
@@ -144,7 +144,7 @@ const payments = [
   {
     id: 'pay_016',
     bookingId: 'bk_015',
-    amount: 475,
+    amount: 3000,
     method: 'card',
     date: '2026-08-10T14:00:00Z',
     status: 'paid',
@@ -153,7 +153,7 @@ const payments = [
   {
     id: 'pay_017',
     bookingId: 'bk_016',
-    amount: 500,
+    amount: 1500,
     method: 'momo',
     date: '2026-07-25T18:00:00Z',
     status: 'paid',
@@ -162,7 +162,7 @@ const payments = [
   {
     id: 'pay_018',
     bookingId: 'bk_013',
-    amount: 100,
+    amount: 300,
     method: 'cash',
     date: '2026-07-20T09:00:00Z',
     status: 'refunded',

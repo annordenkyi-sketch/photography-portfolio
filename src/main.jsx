@@ -6,7 +6,10 @@ import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    {/* useTransitions={false}: apply route changes immediately so the
+        page transitions (hooks/usePageTransition.js)
+        can capture the new page inside document.startViewTransition. */}
+    <BrowserRouter useTransitions={false}>
       <App />
     </BrowserRouter>
   </StrictMode>,

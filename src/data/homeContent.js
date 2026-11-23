@@ -10,7 +10,7 @@ export const homeContent = {
   hero: {
     eyebrow: 'Photography · Accra, Ghana',
     primaryCta: { label: 'Book a Session', to: '/packages' },
-    secondaryCta: { label: 'View Portfolio', to: '/gallery' },
+    secondaryCta: { label: 'View Portfolio', to: '/portfolio' },
   },
 
   about: {
@@ -31,24 +31,6 @@ export const homeContent = {
     { number: '12',   label: 'Regions covered' },
   ],
 
-  // Section heading + tagline only. The category cards themselves are
-  // derived at render time from src/data/galleryCategories.js (shared with
-  // the Gallery tabs and admin Portfolio) so names and order can never
-  // drift. Edit a category's label or description there, not here.
-  services: {
-    heading: 'What I shoot',
-    tagline: 'Pick the kind of work closest to yours — the gallery filters to match.',
-  },
-
-  howItWorks: {
-    heading: 'How booking works',
-    tagline: 'Three steps between first message and shoot day.',
-    steps: [
-      { number: 1, title: 'Choose a package', body: 'Browse the three tiers and pick the one closest to your shoot.' },
-      { number: 2, title: 'Pick a date & time',  body: 'Select an available slot right in the booking form.' },
-      { number: 3, title: 'Get confirmed',       body: "I'll reach out within 48 hours to lock in the details." },
-    ],
-  },
 
   testimonials: {
     heading: 'In their words',
@@ -91,8 +73,9 @@ export const homeContent = {
         quote: 'I was so nervous and he put me completely at ease — the maternity shots are everything I hoped for.',
         name: ' Akosua Boateng',
         role: 'Maternity · Airport Residential',
-        image: 'https://images.unsplash.com/photo-1544784179-ae1535e9f013?w=800&h=800&q=80&fm=webp&auto=format&fit=crop',
-        imageAlt: 'Silhouette of a pregnant woman holding her belly against a bright background.',
+        // Same photo as portfolio seed_10 ("Maternity shoot at sundown").
+        image: 'https://images.unsplash.com/flagged/photo-1576011276208-39d066a314ba?w=800&h=800&q=80&fm=webp&auto=format&fit=crop',
+        imageAlt: 'Silhouette of a pregnant woman standing on the shore at dusk.',
       },
     ],
   },
@@ -101,7 +84,7 @@ export const homeContent = {
     tagline: 'Photography across Accra and beyond.',
     quickLinks: [
       { label: 'Home',     to: '/home' },
-      { label: 'Gallery',  to: '/gallery' },
+      { label: 'Portfolio', to: '/portfolio' },
       { label: 'Packages', to: '/packages' },
     ],
     smallPrint: 'Available for weddings, portraits, events, and editorial commissions.',
@@ -112,7 +95,6 @@ export const homeContent = {
 export const PLACEHOLDERS = [
   'About — paragraphs (src/data/homeContent.js → about.paragraphs)',
   'Stats numbers (src/data/homeContent.js → stats)',
-  'Services — category descriptions (src/data/homeContent.js → services.items)',
   'Testimonials — all 4 entries marked [PLACEHOLDER]',
   'Site image: About portrait  — upload in Admin → Portfolio → Website images → "About portrait"',
   'Site image: Final CTA cover  — upload in Admin → Portfolio → Website images → "Final CTA background"',

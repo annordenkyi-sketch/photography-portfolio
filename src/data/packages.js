@@ -1,54 +1,127 @@
-// Placeholder pricing. Replace with real packages when ready.
-// `price` is the display string; `amount` is the numeric cedi value used by
-// the admin side (payment calculations, booking totals). `deposit` is the
-// up-front amount shown on the Packages card and expected at booking.
-// `featured: true` marks the "Most popular" tier — toggled directly in
-// this file for now; a future admin Content page can edit the same field.
-export const packages = [
+// =========================================================================
+// Packages — the single place to edit prices and what each package
+// includes. Read by the Packages page, the booking pop-up, the /book page,
+// the admin "Add booking" form and the slot calendar.
+//
+// Fields
+//   id                 URL-safe id (used in /book?package=…)
+//   name               display name; bookings store this name
+//   amount             price in Ghana cedis (number) — booking totals,
+//                      balances and payment maths all use this
+//   price              display string, derived from `amount` below
+//   duration           shown on the card
+//   editedPhotos       number (or text like '300+') of edited photos
+//   depositPercent     share of `amount` due to confirm the date
+//   slots              2-hour calendar slots the shoot occupies (used when
+//                      the admin slot settings don't list this package)
+//   category           Portfolio category the photo comes from
+//   portfolioPhotoId   Portfolio photo shown on the card (seed_… or an
+//                      uploaded photo's id). Change the photo in Admin →
+//                      Portfolio and the card follows.
+//   photoSubject       optional: only Portfolio photos tagged with this
+//                      `subject` (e.g. 'graduation') are used for the card
+//                      and its thumbnails (none use it at the moment)
+//   featured           true = "Most popular" (one package)
+//   description        one line under the name
+//   features           short list on the card
+// =========================================================================
+
+const CEDI = 'GH₵'
+
+// "GH₵ 1,500"
+export function formatCedis(amount) {
+  return `${CEDI} ${Number(amount || 0).toLocaleString('en-GB')}`
+}
+
+const PACKAGE_LIST = [
   {
-    id: 'essential',
-    name: 'Essential',
-    price: '₵250',
-    amount: 250,
-    deposit: '₵75',
-    duration: '2 hours',
+    id: 'portrait',
+    name: 'Portrait session',
+    amount: 800,
+    duration: '1 hour',
+    editedPhotos: 15,
+    depositPercent: 50,
+    slots: 1,
+    category: 'Portrait',
+    portfolioPhotoId: 'seed_9',
+    description: 'Individual portraits for profiles, personal branding and milestones.',
     features: [
-      'Up to 2 hours of coverage',
-      '30 edited digital photos',
-      'Online gallery delivery',
       '1 location',
+      'Up to 2 outfit changes',
+      'Online gallery delivery',
     ],
   },
   {
-    id: 'standard',
-    name: 'Standard',
-    price: '₵500',
-    amount: 500,
-    deposit: '₵150',
+    id: 'event',
+    name: 'Event coverage',
+    amount: 3000,
     duration: '4 hours',
-    featured: true,
+    editedPhotos: 150,
+    depositPercent: 50,
+    slots: 2,
+    category: 'Event',
+    portfolioPhotoId: 'seed_16',
+    description: 'Birthdays, launches, parties and corporate events, covered start to finish.',
     features: [
-      'Up to 4 hours of coverage',
-      '80 edited digital photos',
-      'Online gallery + print rights',
-      'Up to 2 locations',
-      'Pre-shoot consultation',
+      'Candid and posed coverage',
+      'Sneak peek within 48 hours',
+      'Online gallery delivery',
     ],
   },
   {
-    id: 'premium',
-    name: 'Premium',
-    price: '₵950',
-    amount: 950,
-    deposit: '₵300',
+    id: 'wedding-standard',
+    name: 'Wedding standard',
+    amount: 6000,
     duration: 'Full day',
+    editedPhotos: 300,
+    depositPercent: 50,
+    slots: 4,
+    category: 'Wedding',
+    portfolioPhotoId: 'seed_6',
+    featured: true,
+    description: 'Your wedding day from preparations to the first dance.',
     features: [
-      'Full-day coverage (up to 8 hours)',
-      '200+ edited digital photos',
-      'Online gallery + print rights',
-      'Unlimited locations',
-      'Pre-shoot consultation',
-      'Second photographer included',
+      'Full-day coverage',
+      'Pre-wedding consultation',
+      'Online gallery with print rights',
+    ],
+  },
+  {
+    id: 'wedding-premium',
+    name: 'Wedding premium',
+    amount: 10000,
+    duration: 'Full day',
+    editedPhotos: '300+',
+    depositPercent: 50,
+    slots: 4,
+    category: 'Wedding',
+    portfolioPhotoId: 'seed_5',
+    description: 'Two photographers, a printed album and a short highlight film.',
+    features: [
+      'Two photographers',
+      'Printed wedding album',
+      'Short highlight film',
+      'Online gallery with print rights',
     ],
   },
 ]
+
+export const packages = PACKAGE_LIST.map((p) => ({
+  ...p,
+  price: formatCedis(p.amount),
+  deposit: formatCedis(Math.round((p.amount * p.depositPercent) / 100)),
+}))
+
+export function findPackageByName(name) {
+  return packages.find((p) => p.name === name) || null
+}
+
+// Earlier package names, kept so stored demo bookings can be moved onto
+// the new packages (see the services' price refresh). 'family-graduation'
+// was removed from the list; bookings already made on it keep their name
+// and total, and take 1 calendar slot.
+export const LEGACY_PACKAGE_IDS = {
+  Essential: 'portrait',
+  Standard: 'family-graduation',
+  Premium: 'wedding-standard',
+}
