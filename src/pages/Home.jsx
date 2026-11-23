@@ -27,6 +27,21 @@ const HERO_WIDE_SRCSET = [800, 1280, 1920, 2400, 3200].map((w) => `${heroWide(w)
 const HERO_TALL_SRCSET = [640, 960, 1280, 1600].map((w) => `${heroTall(w)} ${w}w`).join(', ')
 const MAX_FEATURED = 9
 
+// Portfolio photos on the Unsplash CDN are requested at the size they're
+// shown (WebP, exact crop) instead of the full 1200px original; uploaded
+// photos (blob: URLs) are used as-is.
+function sized(url, w, h) {
+  if (!url || !url.includes('images.unsplash.com')) return url
+  const u = new URL(url)
+  u.searchParams.set('w', String(w))
+  u.searchParams.set('h', String(h))
+  u.searchParams.set('fit', 'crop')
+  u.searchParams.set('fm', 'webp')
+  u.searchParams.set('q', '80')
+  return u.toString()
+}
+const isResizable = (url) => Boolean(url && url.includes('images.unsplash.com'))
+
 function initials(name) {
   return (name || '')
     .replace(/\[PLACEHOLDER\]\s*/g, '')
@@ -183,11 +198,15 @@ export default function Home() {
                   aria-label={`Open ${p.title || p.category} full size`}
                 >
                   <img
-                    src={p.resolvedSrc}
+                    src={sized(p.resolvedSrc, 800, 1000)}
+                    srcSet={isResizable(p.resolvedSrc)
+                      ? [480, 800, 1200].map((w) => `${sized(p.resolvedSrc, w, Math.round(w * 1.25))} ${w}w`).join(', ')
+                      : undefined}
+                    sizes="(min-width: 900px) 33vw, 50vw"
                     alt={p.title || p.category}
                     width="800"
                     height="1000"
-                    loading="lazy"
+                    loading={i < 3 ? 'eager' : 'lazy'}
                     decoding="async"
                   />
                 </button>
@@ -259,7 +278,11 @@ export default function Home() {
           {ctaPhoto && (
             <img
               className="xoon-cta-img"
-              src={ctaPhoto.resolvedSrc}
+              src={sized(ctaPhoto.resolvedSrc, 1600, 900)}
+              srcSet={isResizable(ctaPhoto.resolvedSrc)
+                ? [960, 1600, 2200].map((w) => `${sized(ctaPhoto.resolvedSrc, w, Math.round(w * 0.5625))} ${w}w`).join(', ')
+                : undefined}
+              sizes="100vw"
               alt=""
               width="1600"
               height="900"

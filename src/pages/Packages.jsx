@@ -15,7 +15,7 @@ import PublicFooter from '../components/PublicFooter.jsx'
 // - Entrance: heading + intro rise in, then the package rows one after
 //   another (90ms apart) as they come into view.
 // - Rows: hover lift + soft shadow, photo zooms to 1.04, button fills;
-//   features fade in one by one and the price counts up when a row comes
+//   features fade in one by one and the price fades in when a row comes
 //   into view; the "Most popular" badge has a slow shimmer.
 // - Press: small scale-down on the card / button.
 // CSS: "PACKAGES MOTION" in index.css. Reduced motion keeps fades only.
@@ -284,7 +284,9 @@ function PackageRow({ pkg, photos, flip, onBook }) {
           <h3 id={`pk-name-${pkg.id}`} className="pk-name">{pkg.name}</h3>
           {pkg.description && <p className="pk-desc">{pkg.description}</p>}
           <p className="pk-price">
-            <CountUp text={`From ${pkg.price}`} active={inView} />
+            {/* Real price only — it fades in with the row (no count-up, which
+                briefly showed prices that don't exist). */}
+            <span className="pk-price-value">From {pkg.price}</span>
           </p>
           <p className="pk-meta">
             <span>{pkg.duration}</span>
@@ -346,38 +348,5 @@ function PhotoFrame({ photo, className, w, sizes }) {
         />
       )}
     </div>
-  )
-}
-
-// Counts a price like "From GH₵ 1,500" up from 0 when `active` turns true (about
-// 0.7s, ease-out). Screen readers get the final price straight away.
-// Reduced motion / unparseable prices: shows the final value.
-function CountUp({ text, active }) {
-  const match = /^(\D*)([\d,]+)(.*)$/.exec(String(text || ''))
-  const target = match ? Number(match[2].replace(/,/g, '')) : null
-  const [value, setValue] = useState(target == null ? null : 0)
-
-  useEffect(() => {
-    if (target == null || !active) return undefined
-    if (prefersReducedMotion()) { setValue(target); return undefined }
-    let frame
-    const start = performance.now()
-    const duration = 700
-    const tick = (now) => {
-      const t = Math.min(1, (now - start) / duration)
-      const eased = 1 - (1 - t) ** 3
-      setValue(Math.round(target * eased))
-      if (t < 1) frame = requestAnimationFrame(tick)
-    }
-    frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
-  }, [active, target])
-
-  if (target == null) return <span className="pk-price-value">{text}</span>
-  return (
-    <span className="pk-price-value">
-      <span aria-hidden="true">{match[1]}{(active ? value : target).toLocaleString('en-GB')}{match[3]}</span>
-      <span className="pk-sr-only">{text}</span>
-    </span>
   )
 }

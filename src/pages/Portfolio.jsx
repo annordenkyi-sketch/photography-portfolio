@@ -178,6 +178,10 @@ export default function Portfolio() {
         y: el.offsetTop + el.offsetHeight - 2,
         w: el.offsetWidth,
       })
+      // Phones: the tabs are one swipeable row — keep the active tab in view.
+      if (list.scrollWidth > list.clientWidth) {
+        list.scrollTo({ left: Math.max(0, el.offsetLeft - (list.clientWidth - el.offsetWidth) / 2) })
+      }
     }
     measure()
     if (typeof ResizeObserver === 'undefined') return undefined

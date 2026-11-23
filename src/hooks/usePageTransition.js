@@ -2,9 +2,9 @@ import { useEffect } from 'react'
 import { flushSync } from 'react-dom'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-// Page transition into /portfolio and /packages: the current page fades
-// out and the new page fades + slides up (CSS: rule 9 "/portfolio motion"
-// in the animation block at the end of index.css).
+// Page transition into /home, /portfolio and /packages: the current page
+// fades out and the new page fades + slides up (CSS: rule 9 "/portfolio
+// motion" in the animation block at the end of index.css).
 //
 // Uses the browser's View Transitions API. BrowserRouter ignores React
 // Router's `viewTransition` prop (it needs a data router), so this listens
@@ -16,12 +16,21 @@ import { useLocation, useNavigate } from 'react-router-dom'
 // Skipped (plain navigation instead) when: already on that page (e.g. the
 // Portfolio category tabs, which animate in-page), reduced motion is on, the browser has no
 // View Transitions support, or the click opens a new tab/window.
-// Also scrolls to the top, which the app didn't do before.
-const ANIMATED_PATHS = new Set(['/portfolio', '/packages'])
+// Every page change also starts at the top of the new page (see below).
+const ANIMATED_PATHS = new Set(['/home', '/portfolio', '/packages'])
 
 export function usePageTransition() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
+
+  // Start each new page at the top. Without this, coming back to Home from
+  // a scrolled page landed mid-page, where photos were still loading and
+  // the hero's entrance had already played out of view. Links to an
+  // in-page anchor (#…) keep the browser's jump.
+  useEffect(() => {
+    if (window.location.hash) return
+    window.scrollTo(0, 0)
+  }, [pathname])
 
   useEffect(() => {
     function onClick(e) {

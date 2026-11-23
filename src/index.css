@@ -7019,8 +7019,10 @@ body:has(.admin-shell) {
   background: transparent;
   max-width: 100vw;
   max-height: 100vh;
+  max-height: 100dvh; /* visible height on phones, browser bar included */
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   color: #fff;
   overflow: visible;
 }
@@ -7045,6 +7047,7 @@ body:has(.admin-shell) {
 .lightbox-img {
   max-width: min(100%, 1400px);
   max-height: calc(100vh - 160px);
+  max-height: calc(100dvh - 160px);
   object-fit: contain;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
   border-radius: var(--radius-sm);
@@ -8534,8 +8537,12 @@ body:has(.admin-shell) {
   object-fit: cover;
   transition: transform 600ms cubic-bezier(0.2, 0.6, 0.2, 1);
 }
-.xoon-photo:hover img,
 .xoon-photo:focus-visible img { transform: scale(1.04); }
+/* Hover only where a mouse can hover; on touch screens a tap would leave
+   the photo stuck zoomed (Emil mobile-native). */
+@media (hover: hover) and (pointer: fine) {
+  .xoon-photo:hover img { transform: scale(1.04); }
+}
 
 /* Scroll reveal: fade in + slide up once */
 .xoon-reveal {
@@ -8925,9 +8932,22 @@ body:has(.admin-shell) {
 .pf-tab:hover { color: var(--xoon-ink); }
 .pf-tab.is-active { color: var(--xoon-ink); }
 .pf-tab:focus-visible { outline: 2px solid var(--xoon-amber); outline-offset: -4px; border-radius: 2px; }
-@media (max-width: 520px) {
-  .pf-tabs-list { gap: 0 1rem; }
-  .pf-tab { min-height: 48px; font-size: 0.7rem; letter-spacing: 0.12em; }
+@media (max-width: 600px) {
+  /* One swipeable row; the right edge fades to hint at more tabs */
+  .pf-tabs-list {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 0 1.25rem;
+    padding-right: 2.5rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+  .pf-tabs-list::-webkit-scrollbar { display: none; }
+  .pf-tabs-list > li { flex: none; }
+  .pf-tab { min-height: 48px; font-size: 0.72rem; letter-spacing: 0.12em; white-space: nowrap; }
 }
 
 /* --------  Photo grid: uniform 4:5 tiles, tight gaps  -------- */
@@ -8961,8 +8981,10 @@ body:has(.admin-shell) {
   object-fit: cover;
   transition: transform 700ms cubic-bezier(0.2, 0.6, 0.2, 1);
 }
-.pf-tile:hover img,
 .pf-tile:focus-visible img { transform: scale(1.03); }
+@media (hover: hover) and (pointer: fine) {
+  .pf-tile:hover img { transform: scale(1.03); }
+}
 .pf-tile:focus-visible { outline: 2px solid var(--xoon-amber); outline-offset: -2px; }
 .pf-tile-caption {
   position: absolute;
@@ -8978,8 +9000,10 @@ body:has(.admin-shell) {
   transform: translateY(8px);
   transition: opacity 300ms ease, transform 300ms ease;
 }
-.pf-tile:hover .pf-tile-caption,
 .pf-tile:focus-visible .pf-tile-caption { opacity: 1; transform: none; }
+@media (hover: hover) and (pointer: fine) {
+  .pf-tile:hover .pf-tile-caption { opacity: 1; transform: none; }
+}
 .pf-tile-cat {
   color: var(--xoon-amber);
   font-size: 0.68rem;
@@ -10247,7 +10271,7 @@ html[data-page-transition]::view-transition-new(root) {
   transition-duration: 160ms !important;
   transition-timing-function: var(--pk-ease) !important;
 }
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .pk-card:hover { transform: translateY(-4px); }
   .pk-card:hover::after { opacity: 1; }
   .pk-card:hover .pk-photo img { transform: scale(1.04); }
@@ -10346,4 +10370,66 @@ html[data-page-transition]::view-transition-new(root) {
   .bk-submit.is-sending .bk-submit-bar { animation: none !important; width: 100%; transform: none; opacity: 0.4; }
   .bk-check-mark,
   .bk-check-ring { animation: pk-fade-in 300ms ease-out both !important; }
+}
+
+/* 11. Phones + press feedback on the dark public pages (Emil Kowalski
+       mobile-native + design-engineering pass, Impeccable audit I1).
+   - Base surface: the dark theme reaches the page edges (phone overscroll,
+     behind dialogs) instead of the old cream dot-grid/stripe pattern and
+     Inter font; scrollbars and form controls follow the dark scheme;
+     text selection uses the amber accent.
+   - No grey tap flash; every control gives its own press feedback.
+   - Press: scale down slightly on press, back on release (140ms
+     ease-out). Overrides rule 4's colour-only transitions for these. */
+html:has(.xoon-shell),
+body:has(.xoon-shell) {
+  background: var(--xoon-bg);
+  background-image: none;
+  color: var(--xoon-ink);
+  font-family: var(--xoon-font);
+  color-scheme: dark;
+}
+html:has(.xoon-shell) { -webkit-tap-highlight-color: transparent; }
+.xoon-shell ::selection { background: rgba(232, 155, 76, 0.4); color: #ffffff; }
+
+.xoon-btn,
+.xoon-text-link,
+.xoon-nav-link,
+.xoon-nav-menu,
+.xoon-quote-arrow,
+.xoon-work-tile,
+.pf-tile,
+.pf-tab,
+.bk2-chip,
+.bk2-close,
+.ct-submit {
+  touch-action: manipulation;
+  transition-property: transform, color, background-color, border-color, outline-color !important;
+  transition-duration: 140ms !important;
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1) !important;
+}
+.xoon-btn:active,
+.xoon-text-link:active,
+.xoon-nav-link:active,
+.xoon-nav-menu:active,
+.xoon-quote-arrow:active,
+.pf-tab:active,
+.bk2-chip:active,
+.bk2-close:active,
+.ct-submit:active:not(:disabled) { transform: scale(0.97); }
+/* Large photo tiles press a little less */
+.xoon-work-tile:active,
+.pf-tile:active { transform: scale(0.985); }
+@media (prefers-reduced-motion: reduce) {
+  .xoon-btn:active,
+  .xoon-text-link:active,
+  .xoon-nav-link:active,
+  .xoon-nav-menu:active,
+  .xoon-quote-arrow:active,
+  .pf-tab:active,
+  .bk2-chip:active,
+  .bk2-close:active,
+  .ct-submit:active,
+  .xoon-work-tile:active,
+  .pf-tile:active { transform: none; }
 }
